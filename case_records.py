@@ -10,7 +10,7 @@ from html.parser import HTMLParser
 from io import BytesIO
 from pathlib import Path
 from urllib.error import HTTPError, URLError
-from urllib.parse import urlencode
+from urllib.parse import quote, urlencode
 from urllib.request import Request, urlopen
 
 from hijridate import Gregorian
@@ -21,6 +21,8 @@ from reportlab.pdfbase.ttfonts import TTFont, shapeStr
 from reportlab.pdfgen import canvas
 
 GOOGLE_DRIVE_DOWNLOAD_URL = 'https://drive.google.com/uc?'
+GOOGLE_DRIVE_API_URL = 'https://www.googleapis.com/drive/v3/files/'
+DEFAULT_GOOGLE_DRIVE_FILE_ID = '1wxYp5pvVh-8fWkW8OV1zMqWz90q59j8H'
 MAX_CSV_BYTES = 20 * 1024 * 1024
 MAX_CSV_ROWS = 100_000
 RECORD_CACHE_SECONDS = 300
@@ -297,28 +299,62 @@ def _parse_case_records(content):
         raise CaseRecordsError('تعذر قراءة ملف سجل القضايا المنشور.') from exc
 
 
+def google_drive_file_id():
+    return os.getenv('GOOGLE_DRIVE_FILE_ID', DEFAULT_GOOGLE_DRIVE_FILE_ID).strip()
+
+
 def _download_case_csv():
-    file_id = os.getenv('GOOGLE_DRIVE_FILE_ID', '').strip()
+    file_id = google_drive_file_id()
     if not file_id:
         raise CaseRecordsError('لم يتم إعداد معرّف ملف سجل القضايا في Google Drive.')
 
-    url = GOOGLE_DRIVE_DOWNLOAD_URL + urlencode({
-        'export': 'download',
-        'id': file_id,
-    })
-    request = Request(url, headers={'User-Agent': 'AlbaydaCourtBot/1.0'})
+    token = os.getenv('GOOGLE_DRIVE_TOKEN', '').strip()
+    if token:
+        url = (
+            GOOGLE_DRIVE_API_URL
+            + quote(file_id, safe='')
+            + '?'
+            + urlencode({'alt': 'media'})
+        )
+        headers = {
+            'Authorization': f'Bearer {token}',
+            'User-Agent': 'AlbaydaCourt/1.0',
+        }
+    else:
+        url = GOOGLE_DRIVE_DOWNLOAD_URL + urlencode({
+            'export': 'download',
+            'id': file_id,
+        })
+        headers = {'User-Agent': 'AlbaydaCourt/1.0'}
+    request = Request(url, headers=headers)
     try:
         with urlopen(request, timeout=DOWNLOAD_TIMEOUT_SECONDS) as response:
             content = response.read(MAX_CSV_BYTES + 1)
+            content_type = response.headers.get_content_type()
+    except HTTPError as exc:
+        logging.warning('Google Drive case CSV returned HTTP %s', exc.code)
+        if exc.code in {401, 403}:
+            raise CaseRecordsError(
+                'رفض Google Drive الوصول إلى سجل القضايا. تحقق من صلاحية '
+                'GOOGLE_DRIVE_TOKEN أو إتاحة الملف عبر الرابط.'
+            ) from exc
+        raise CaseRecordsError(
+            f'أعاد Google Drive رمز استجابة HTTP {exc.code} عند تنزيل سجل القضايا.'
+        ) from exc
     except (URLError, TimeoutError, OSError) as exc:
         logging.warning('Google Drive case CSV is unavailable (%s)', type(exc).__name__)
         raise CaseRecordsError(
             'تعذر تنزيل سجل القضايا من Google Drive. '
-            'تحقق من إتاحة الملف عبر الرابط واتصال الإنترنت.'
+            'تحقق من إتاحة الملف عبر الرابط ورمز الوصول واتصال الإنترنت.'
         ) from exc
 
     if len(content) > MAX_CSV_BYTES:
         raise CaseRecordsError('ملف سجل القضايا يتجاوز الحد المسموح للحجم.')
+    if content_type == 'text/html':
+        raise CaseRecordsError(
+            'أعاد Google Drive صفحة ويب بدلاً من CSV. تحقق من مشاركة الملف '
+            'أو إعداد GOOGLE_DRIVE_TOKEN.'
+        )
     return content
 
 

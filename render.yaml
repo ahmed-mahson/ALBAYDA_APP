@@ -11,9 +11,9 @@ services:
         value: "10000"
       - key: ALBAYDA_HOST
         value: "0.0.0.0"
-      - key: COURT_API_BASE_URL
-        sync: false
-      - key: COURT_API_KEY
+      - key: GOOGLE_DRIVE_FILE_ID
+        value: "1wxYp5pvVh-8fWkW8OV1zMqWz90q59j8H"
+      - key: GOOGLE_DRIVE_TOKEN
         sync: false
       - key: APP_ACCESS_PASSWORD
         sync: false

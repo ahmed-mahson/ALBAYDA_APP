@@ -8,7 +8,7 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY app.py case_records.py court_source.py ./
+COPY app.py case_records.py ./
 COPY assets ./assets
 COPY web ./web
 

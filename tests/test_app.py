@@ -5,7 +5,7 @@ from unittest.mock import patch
 
 import app
 import case_records
-import court_source
+from case_records import CaseRecordsError
 
 
 def make_record():
@@ -48,7 +48,10 @@ class ApplicationTests(unittest.TestCase):
         self.assertEqual(response["status"], "200 OK")
         self.assertIn(b"dir=\"rtl\"", body)
         self.assertIn("قائمة الجلسات".encode(), body)
-        self.assertIn("الأمناء الشرعيون".encode(), body)
+        self.assertNotIn("سجل جلسات القضية".encode(), body)
+        self.assertNotIn("الأمناء الشرعيون".encode(), body)
+        self.assertNotIn(b"case-sittings", body)
+        self.assertNotIn(b"trustees", body)
         self.assertNotIn("الوارد والصادر".encode(), body)
         self.assertNotIn(b"in-out", body)
         self.assertIn(b'id="case-search-method"', body)
@@ -78,22 +81,21 @@ class ApplicationTests(unittest.TestCase):
         self.assertEqual(response["status"], "200 OK")
         self.assertEqual(response["headers"]["Content-Type"], "font/ttf")
 
-    def test_status_does_not_expose_the_court_api_key(self):
-        with patch.dict("os.environ", {"COURT_API_KEY": "private-api-key"}):
+    def test_status_does_not_expose_the_google_drive_token(self):
+        with patch.dict("os.environ", {"GOOGLE_DRIVE_TOKEN": "private-drive-token"}):
             response, body = self.request("/api/status")
 
         self.assertEqual(response["status"], "200 OK")
         result = json.loads(body)
         self.assertTrue(result["source_configured"])
         self.assertFalse(result["authentication_required"])
-        self.assertNotIn("private-api-key", body.decode())
+        self.assertNotIn("private-drive-token", body.decode())
 
     def test_auth_protects_app_and_accepts_a_signed_login_cookie(self):
         auth_config = {
             "APP_REQUIRE_AUTH": "true",
             "APP_ACCESS_PASSWORD": "test-password",
             "APP_SESSION_SECRET": "test-session-secret",
-            "COURT_API_KEY": "test-court-api-key",
         }
         with patch.dict("os.environ", auth_config):
             protected, _ = self.request("/")
@@ -147,8 +149,8 @@ class ApplicationTests(unittest.TestCase):
         self.assertEqual(login["status"], "503 Service Unavailable")
         self.assertEqual(protected["status"], "401 Unauthorized")
 
-    @patch.object(court_source, "search_cases", return_value=[make_record()])
-    def test_case_search_uses_the_original_court_source(self, search_cases):
+    @patch.object(case_records, "load_case_records", return_value=[make_record()])
+    def test_case_search_uses_the_google_drive_records(self, load_records):
         response, body = self.request(
             "/api/cases/search",
             "POST",
@@ -159,12 +161,10 @@ class ApplicationTests(unittest.TestCase):
         result = json.loads(body)
         self.assertEqual(result["count"], 1)
         self.assertEqual(result["results"][0]["المدعي"], "أحمد")
-        search_cases.assert_called_once_with(
-            "1446/25", method=None, case_type="all", judge="all", limit=5
-        )
+        load_records.assert_called_once_with()
 
-    @patch.object(court_source, "search_cases", return_value=[make_record()])
-    def test_case_search_supports_bot_name_and_filters(self, search_cases):
+    @patch.object(case_records, "load_case_records", return_value=[make_record()])
+    def test_case_search_supports_name_and_csv_filters(self, load_records):
         response, body = self.request(
             "/api/cases/search",
             "POST",
@@ -178,72 +178,44 @@ class ApplicationTests(unittest.TestCase):
 
         self.assertEqual(response["status"], "200 OK")
         self.assertEqual(json.loads(body)["count"], 1)
-        search_cases.assert_called_once_with(
-            "أحمد",
-            method="name",
-            case_type="مدنيــــة",
-            judge="القاضي الأول",
-            limit=5,
-        )
+        load_records.assert_called_once_with()
 
     @patch.object(
-        court_source,
-        "get_case_search_options",
-        return_value={"case_types": ["مدنيــــة"], "judges": ["القاضي الأول"]},
+        case_records,
+        "load_case_records",
+        return_value=[make_record()],
     )
-    def test_case_options_are_loaded_from_original_court_source(self, get_options):
+    def test_case_options_are_loaded_from_google_drive_records(self, load_records):
         response, body = self.request(
             "/api/cases/options", "POST", {"case_type": "مدنيــــة"}
         )
 
         self.assertEqual(response["status"], "200 OK")
         self.assertEqual(json.loads(body)["judges"], ["القاضي الأول"])
-        get_options.assert_called_once_with("مدنيــــة")
+        self.assertEqual(json.loads(body)["case_types"], ["مدنيــــة"])
+        load_records.assert_called_once_with()
 
-    def test_case_search_reports_missing_original_source_key(self):
-        with patch.dict("os.environ", {"COURT_API_KEY": ""}):
-            response, body = self.request(
-                "/api/cases/search", "POST", {"query": "1446/25"}
-            )
+    @patch.object(
+        case_records,
+        "load_case_records",
+        side_effect=CaseRecordsError("رفض Google Drive الوصول إلى سجل القضايا."),
+    )
+    def test_case_search_reports_google_drive_access_errors(self, _load_records):
+        response, body = self.request(
+            "/api/cases/search", "POST", {"query": "1446/25"}
+        )
 
         self.assertEqual(response["status"], "503 Service Unavailable")
-        self.assertIn("COURT_API_KEY", json.loads(body)["error"])
+        self.assertIn("Google Drive", json.loads(body)["error"])
 
-    @patch.object(
-        court_source,
-        "search_case_sittings",
-        return_value=[{"رقم القضية": "1446/25", "رقم الجلسة": "1"}],
-    )
-    def test_case_sittings_use_original_service(self, search_case_sittings):
-        response, body = self.request(
-            "/api/cases/sittings", "POST", {"query": "1446/25"}
-        )
+    def test_removed_case_sittings_and_trustee_apis_return_not_found(self):
+        for path in ("/api/cases/sittings", "/api/legal-trustees/search"):
+            with self.subTest(path=path):
+                response, _body = self.request(path, "POST", {})
+                self.assertEqual(response["status"], "404 Not Found")
 
-        self.assertEqual(response["status"], "200 OK")
-        result = json.loads(body)
-        self.assertEqual(result["count"], 1)
-        search_case_sittings.assert_called_once_with("1446/25")
-
-    @patch.object(
-        court_source,
-        "search_legal_trustees",
-        return_value=[{"اسم الأمين الشرعي": "أمين"}],
-    )
-    def test_legal_trustee_search_uses_original_service(self, search_trustees):
-        response, body = self.request(
-            "/api/legal-trustees/search", "POST", {"query": "أمين"}
-        )
-
-        self.assertEqual(response["status"], "200 OK")
-        self.assertEqual(json.loads(body)["count"], 1)
-        search_trustees.assert_called_once_with("أمين")
-
-    def test_removed_in_out_api_returns_not_found(self):
-        response, _body = self.request("/api/in-out/search", "POST", {})
-        self.assertEqual(response["status"], "404 Not Found")
-
-    @patch.object(court_source, "search_cases", return_value=[make_record()])
-    def test_case_report_uses_original_court_data(self, _search_cases):
+    @patch.object(case_records, "load_case_records", return_value=[make_record()])
+    def test_case_report_uses_google_drive_case_data(self, _load_records):
         response, body = self.request(
             "/api/cases/report", "POST", {"case_number": "1446/25"}
         )
@@ -252,8 +224,8 @@ class ApplicationTests(unittest.TestCase):
         self.assertEqual(response["headers"]["Content-Type"], "application/pdf")
         self.assertTrue(body.startswith(b"%PDF-"))
 
-    @patch.object(court_source, "search_sessions", return_value=[make_record()])
-    def test_sessions_search_uses_original_court_source(self, search_sessions):
+    @patch.object(case_records, "load_case_records", return_value=[make_record()])
+    def test_sessions_search_uses_google_drive_case_data(self, load_records):
         response, body = self.request(
             "/api/sessions/search",
             "POST",
@@ -267,10 +239,10 @@ class ApplicationTests(unittest.TestCase):
         result = json.loads(body)
         self.assertEqual(result["count"], 1)
         self.assertEqual(result["results"][0]["رقم القضية"], "1446/25")
-        search_sessions.assert_called_once_with("2026-12-01")
+        load_records.assert_called_once_with()
 
-    @patch.object(court_source, "search_sessions", return_value=[make_record()])
-    def test_sessions_search_accepts_bot_today_and_filters_all_judges(self, search_sessions):
+    @patch.object(case_records, "load_case_records", return_value=[make_record()])
+    def test_sessions_search_accepts_today_and_all_judges(self, load_records):
         with patch.object(app, "datetime") as mock_datetime:
             mock_datetime.now.return_value.date.return_value.isoformat.return_value = "2026-12-01"
             response, body = self.request(
@@ -280,10 +252,10 @@ class ApplicationTests(unittest.TestCase):
         self.assertEqual(response["status"], "200 OK")
         self.assertEqual(json.loads(body)["date"], "2026-12-01")
         self.assertEqual(json.loads(body)["count"], 1)
-        search_sessions.assert_called_once_with("2026-12-01")
+        load_records.assert_called_once_with()
 
-    @patch.object(court_source, "search_sessions", return_value=[make_record()])
-    def test_sessions_pdf_endpoint_uses_official_template(self, _search_sessions):
+    @patch.object(case_records, "load_case_records", return_value=[make_record()])
+    def test_sessions_pdf_endpoint_uses_official_template(self, _load_records):
         response, body = self.request(
             "/api/sessions/pdf",
             "POST",
@@ -302,8 +274,8 @@ class ApplicationTests(unittest.TestCase):
         self.assertEqual(response["status"], "400 Bad Request")
         self.assertIn("تاريخ الجلسة", json.loads(body)["error"])
 
-    @patch.object(court_source, "search_cases", return_value=[make_record()])
-    def test_attendance_ad_uses_original_case_and_official_template(self, search_cases):
+    @patch.object(case_records, "load_case_records", return_value=[make_record()])
+    def test_attendance_ad_uses_google_drive_case_and_official_template(self, load_records):
         response, body = self.request(
             "/api/attendance-ad",
             "POST",
@@ -322,13 +294,7 @@ class ApplicationTests(unittest.TestCase):
         self.assertEqual(response["headers"]["Content-Type"], "application/pdf")
         self.assertTrue(body.startswith(b"%PDF-"))
         self.assertIn("filename*=UTF-8''", response["headers"]["Content-Disposition"])
-        search_cases.assert_called_once_with(
-            "1446/25",
-            method="number",
-            case_type="مدنيــــة",
-            judge="القاضي الأول",
-            limit=1,
-        )
+        load_records.assert_called_once_with()
 
     @patch.object(
         case_records,

@@ -32,7 +32,7 @@
       <button class="service-card" type="button" data-open="case-panel" aria-label="الاستعلام عن قضية" aria-describedby="case-service-description">
         <span class="service-icon service-icon--case" aria-hidden="true"><svg viewBox="0 0 64 64"><path d="M15 8h23l11 11v17"></path><path d="M38 9v12h12M15 8v48h23"></path><path d="M23 30h13m-13 8h9"></path><circle cx="43" cy="43" r="9"></circle><path d="m50 50 7 7"></path></svg></span>
         <span class="card-title">الاستعلام عن قضية</span>
-        <span class="card-description" id="case-service-description">ابحث برقم القضية في سجل المحكمة الإلكتروني الأصلي.</span>
+        <span class="card-description" id="case-service-description">ابحث في ملف سجل القضايا المنشور على Google Drive.</span>
         <span class="card-link">بدء الاستعلام <span aria-hidden="true">←</span></span>
       </button>
       <button class="service-card" type="button" data-open="sessions-panel" aria-label="قائمة الجلسات" aria-describedby="sessions-service-description">
@@ -40,18 +40,6 @@
         <span class="card-title">قائمة الجلسات</span>
         <span class="card-description" id="sessions-service-description">اعرض جلسات يوم محدد مع إمكانية تصفيتها حسب القاضي.</span>
         <span class="card-link">عرض الجلسات <span aria-hidden="true">←</span></span>
-      </button>
-      <button class="service-card" type="button" data-open="case-sittings-panel" aria-label="جلسات قضية" aria-describedby="case-sittings-service-description">
-        <span class="service-icon service-icon--case-sittings" aria-hidden="true"><svg viewBox="0 0 64 64"><path d="M14 10h36v44H14zM22 20h20M22 29h20M22 38h9"></path><circle cx="42" cy="43" r="8"></circle><path d="m48 49 6 6"></path></svg></span>
-        <span class="card-title">جلسات قضية</span>
-        <span class="card-description" id="case-sittings-service-description">راجع سجل جلسات القضية من خدمة التطبيق الأصلي.</span>
-        <span class="card-link">بحث برقم القضية <span aria-hidden="true">←</span></span>
-      </button>
-      <button class="service-card" type="button" data-open="trustees-panel" aria-label="الأمناء الشرعيون" aria-describedby="trustees-service-description">
-        <span class="service-icon service-icon--trustees" aria-hidden="true"><svg viewBox="0 0 64 64"><circle cx="24" cy="20" r="10"></circle><path d="M7 53v-5c0-9 7-15 17-15s17 6 17 15v5M44 17h13M44 25h13M44 33h9"></path></svg></span>
-        <span class="card-title">الأمناء الشرعيون</span>
-        <span class="card-description" id="trustees-service-description">ابحث بالاسم أو رقم الترخيص ضمن سجل الأمناء.</span>
-        <span class="card-link">بحث في السجل <span aria-hidden="true">←</span></span>
       </button>
       <button class="service-card" type="button" data-open="ad-panel" aria-label="إعلان حضور جلسة" aria-describedby="ad-service-description">
         <span class="service-icon service-icon--ad" aria-hidden="true"><svg viewBox="0 0 64 64"><path d="M15 8h23l11 11v15"></path><path d="M38 9v12h12M15 8v48h23"></path><path d="M22 31h15m-15 8h12"></path><path d="m39 49 12-12 5 5-12 12-7 2z"></path></svg></span>
@@ -74,7 +62,7 @@
       </div>
 
       <section class="tool-panel" id="case-panel" hidden>
-        <p class="panel-note">كما في البحث المباشر بالبوت: أدخل رقم القضية أو اسم المدعي أو المدعى عليه. ويمكن تضييق النتائج حسب نوع القضية والقاضي من سجل التطبيق الأصلي.</p>
+        <p class="panel-note">أدخل رقم القضية أو اسم المدعي أو المدعى عليه، ويمكن تضييق النتائج حسب نوع القضية والقاضي من ملف سجل القضايا على Google Drive.</p>
         <form id="case-form" class="form-grid">
           <label class="field">نوع القضية
             <select name="case_type" id="case-search-type" required>
@@ -118,27 +106,8 @@
         </form>
       </section>
 
-      <section class="tool-panel" id="case-sittings-panel" hidden>
-        <p class="panel-note">أدخل رقم القضية كما في البوت؛ يقبل البحث الأرقام العربية أو الإنجليزية وصيغتي السنة/الرقم أو الرقم/السنة.</p>
-        <form id="case-sittings-form" class="form-grid">
-          <label class="field field-wide">رقم القضية
-            <input name="query" maxlength="40" placeholder="مثال: 1446/25" required>
-          </label>
-          <div class="field-actions"><button class="primary-button" type="submit">بحث عن جلسات القضية</button></div>
-        </form>
-      </section>
-
-      <section class="tool-panel" id="trustees-panel" hidden>
-        <form id="trustees-form" class="form-grid">
-          <label class="field field-wide">اسم الأمين الشرعي أو رقم الترخيص
-            <input name="query" maxlength="100" placeholder="أدخل الاسم أو رقم الترخيص" required>
-          </label>
-          <div class="field-actions"><button class="primary-button" type="submit">بحث في سجل الأمناء</button></div>
-        </form>
-      </section>
-
       <section class="tool-panel" id="ad-panel" hidden>
-        <p class="panel-note">كما في البوت، اختر نوع القضية ثم القاضي، وأدخل رقم القضية وتاريخ الجلسة. تُجلب بيانات القضية من خدمة التطبيق الأصلي ويمكنك مراجعتها وتحريرها قبل تنزيل الإعلان.</p>
+        <p class="panel-note">اختر نوع القضية ثم القاضي، وأدخل رقم القضية وتاريخ الجلسة. تُجلب بيانات القضية من ملف Google Drive ويمكنك مراجعتها وتحريرها قبل تنزيل الإعلان.</p>
         <form id="ad-form" class="form-grid">
           <label class="field">نوع القضية
             <select name="case_type" id="ad-case-type" required>

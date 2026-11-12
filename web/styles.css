@@ -68,8 +68,7 @@ main { max-width: 1320px; margin: 0 auto; padding: 0 clamp(18px, 5vw, 68px) 36px
   color: var(--green); background: #fff; border-radius: 14px; margin-bottom: 12px;
 }
 .service-icon svg { width: 48px; height: 48px; fill: none; stroke: currentColor; stroke-width: 4.5; stroke-linecap: round; stroke-linejoin: round; }
-.service-icon--sessions, .service-icon--case-sittings, .service-icon--trustees,
-.service-icon--ad, .service-icon--supreme {
+.service-icon--sessions, .service-icon--ad, .service-icon--supreme {
   color: var(--green); background: #fff;
 }
 .card-title { font-size: 18px; line-height: 1.5; font-weight: 800; color: var(--ink); }

@@ -15,7 +15,6 @@ from wsgiref.simple_server import WSGIServer, make_server
 from socketserver import ThreadingMixIn
 
 import case_records
-import court_source
 from case_records import CaseRecordsError
 from dotenv import load_dotenv
 
@@ -233,19 +232,44 @@ def _case_search(payload):
         payload, "query", "رقم القضية أو اسم أحد الأطراف", required=True, limit=100
     )
     method = _text(payload, "method", "طريقة البحث", limit=20)
-    if method == "auto":
-        method = ""
+    if method in {"", "auto"}:
+        method = "number" if "/" in query else "name"
+    if method not in {"number", "name"}:
+        raise ValueError("طريقة البحث غير صالحة.")
     case_type = _text(payload, "case_type", "نوع القضية", limit=100) or "all"
     judge = _text(payload, "judge", "القاضي", limit=160) or "all"
-    matches = court_source.search_cases(
-        query, method=method or None, case_type=case_type, judge=judge, limit=5
+    records = case_records.load_case_records()
+    if (
+        case_type != "all"
+        and case_type not in case_records.available_case_types(records)
+    ):
+        raise ValueError("نوع القضية المحدد غير متوفر في سجل القضايا.")
+    matches = case_records.search_case_records(
+        records, query, method, case_type=case_type, judge=judge, limit=5
     )
     return {"count": len(matches), "results": matches}
 
 
 def _case_search_options(payload):
     case_type = _text(payload, "case_type", "نوع القضية", limit=100) or "all"
-    return court_source.get_case_search_options(case_type)
+    records = case_records.load_case_records()
+    case_types = case_records.available_case_types(records)
+    if case_type != "all" and case_type not in case_types:
+        raise ValueError("نوع القضية المحدد غير متوفر في سجل القضايا.")
+    filtered_records = records if case_type == "all" else [
+        record for record in records
+        if case_records.case_type_matches(record.get("نوع القضية"), case_type)
+    ]
+    return {
+        "case_types": case_types,
+        "case_type_sources": {
+            name: list(case_records.CASE_TYPE_SOURCE_BY_DISPLAY_NAME.get(
+                name, (name,)
+            ))
+            for name in case_types
+        },
+        "judges": case_records.available_judges(filtered_records),
+    }
 
 
 def _sitting_date(value, label):
@@ -263,7 +287,9 @@ def _session_search(payload):
         "تاريخ الجلسة",
     )
     judge = _text(payload, "judge", "القاضي", limit=100) or "all"
-    sessions = court_source.search_sessions(sitting_date)
+    sessions = case_records.search_sessions_by_date(
+        case_records.load_case_records(), sitting_date
+    )
     if judge != "all":
         sessions = [
             row for row in sessions
@@ -276,21 +302,6 @@ def _session_search(payload):
         "count": len(sessions),
         "results": sessions,
     }
-
-
-def _case_sittings_search(payload):
-    query = _text(payload, "query", "رقم القضية", required=True, limit=40)
-    results = court_source.search_case_sittings(query)
-    return {"query": query, "count": len(results), "results": results}
-
-
-def _legal_trustees_search(payload):
-    query = _text(
-        payload, "query", "اسم الأمين الشرعي أو رقم ترخيصه",
-        required=True, limit=100,
-    )
-    results = court_source.search_legal_trustees(query)
-    return {"query": query, "count": len(results), "results": results}
 
 
 def _supreme_search(payload):
@@ -331,22 +342,17 @@ def _post_api(path, payload, start_response):
             start_response, HTTPStatus.OK, _case_search_options(payload)
         )
 
-    if path == "/api/cases/sittings":
-        return _json_response(
-            start_response, HTTPStatus.OK, _case_sittings_search(payload)
-        )
-
-    if path == "/api/legal-trustees/search":
-        return _json_response(
-            start_response, HTTPStatus.OK, _legal_trustees_search(payload)
-        )
-
     if path == "/api/cases/report":
         case_number = _text(
             payload, "case_number", "رقم القضية", required=True, limit=40
         )
         normalized_number = case_records._normalize_case_number(case_number)
-        records = court_source.search_cases(case_number)
+        records = case_records.search_case_records(
+            case_records.load_case_records(),
+            case_number,
+            "number",
+            limit=100,
+        )
         record = next(
             (
                 row for row in records
@@ -392,9 +398,10 @@ def _post_api(path, payload, start_response):
         )
         plaintiff = _text(payload, "plaintiff", "اسم المدعي", required=True, limit=200)
         defendant = _text(payload, "defendant", "اسم المدعى عليه", required=True, limit=200)
-        matches = court_source.search_cases(
+        matches = case_records.search_case_records(
+            case_records.load_case_records(),
             case_number,
-            method="number",
+            "number",
             case_type=case_type,
             judge=judge_filter,
             limit=1,
@@ -415,7 +422,7 @@ def _post_api(path, payload, start_response):
         )
         if record is None:
             raise CaseRecordsError(
-                "لم أجد القضية بهذا الرقم ضمن النوع والقاضي المحددين في سجل التطبيق الأصلي."
+                "لم أجد القضية بهذا الرقم ضمن النوع والقاضي المحددين في ملف سجل القضايا."
             )
         case_number = record["رقم القضية"]
         pdf = case_records.generate_attendance_ad_pdf(
@@ -534,7 +541,7 @@ def application(environ, start_response):
             {
                 "name": "albayda_court",
                 "court": "تقنية معلومات محكمة البيضاء الابتدائية",
-                "source_configured": bool(os.getenv("COURT_API_KEY", "").strip()),
+                "source_configured": bool(case_records.google_drive_file_id()),
                 "authentication_required": _auth_required(),
             },
         )
@@ -546,7 +553,7 @@ def application(environ, start_response):
                 start_response, HTTPStatus.BAD_REQUEST, {"error": str(exc)}
             )
         except CaseRecordsError as exc:
-            LOGGER.warning("Court service request failed: %s", exc)
+            LOGGER.warning("Source data request failed: %s", exc)
             return _json_response(
                 start_response, HTTPStatus.SERVICE_UNAVAILABLE, {"error": str(exc)}
             )
@@ -592,13 +599,6 @@ def main():
             raise RuntimeError("APP_ACCESS_PASSWORD must contain at least 12 characters.")
         if len(os.getenv("APP_SESSION_SECRET", "")) < 32:
             raise RuntimeError("APP_SESSION_SECRET must contain at least 32 characters.")
-        base_url = os.getenv(
-            "COURT_API_BASE_URL", court_source.DEFAULT_COURT_API_BASE_URL
-        ).strip()
-        if not base_url.casefold().startswith("https://"):
-            raise RuntimeError(
-                "Authenticated public deployment requires an HTTPS court API endpoint."
-            )
     with make_server(host, port, application, server_class=ThreadingWSGIServer) as server:
         LOGGER.info("albayda_court is listening on http://%s:%s", host, port)
         try:

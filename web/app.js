@@ -66,8 +66,6 @@ function openPanel(id) {
   const labels = {
     "case-panel": "الاستعلام عن قضية",
     "sessions-panel": "قائمة الجلسات",
-    "case-sittings-panel": "سجل جلسات القضية",
-    "trustees-panel": "الأمناء الشرعيون",
     "ad-panel": "إنشاء إعلان حضور جلسة",
     "supreme-panel": "الاستعلام عن قضايا المحكمة العليا",
   };
@@ -165,27 +163,6 @@ function renderSessions(payload) {
     table.append(head, body);
     wrap.append(table);
     resultsElement.append(wrap);
-  }
-  resultsElement.hidden = false;
-  setStatus("");
-}
-
-function renderRecordList(payload, titleField, emptyMessage) {
-  resultsElement.replaceChildren();
-  const summary = document.createElement("p");
-  summary.className = "result-summary";
-  summary.textContent = payload.count ? `عدد النتائج: ${payload.count}` : emptyMessage;
-  resultsElement.append(summary);
-  for (const record of payload.results) {
-    const card = document.createElement("article");
-    card.className = "result-card";
-    const title = document.createElement("h3");
-    title.textContent = record[titleField] || "سجل من التطبيق الأصلي";
-    card.append(title);
-    addItemGrid(card, record, Object.fromEntries(
-      Object.keys(record).map((key) => [key, [key]]),
-    ));
-    resultsElement.append(card);
   }
   resultsElement.hidden = false;
   setStatus("");
@@ -301,7 +278,7 @@ function initializePanelOptions(panelId) {
   if (!["case-panel", "sessions-panel", "ad-panel"].includes(panelId)) return Promise.resolve();
 
   const loading = (async () => {
-    setStatus("جارٍ تحميل الأقسام والقضاة من سجل التطبيق الأصلي…", "loading");
+    setStatus("جارٍ تحميل الأقسام والقضاة من ملف القضايا…", "loading");
     try {
       const allOptions = await fetchCaseOptions();
       caseTypeSources = allOptions.case_type_sources || {};
@@ -340,7 +317,7 @@ async function loadMeta() {
     const status = await response.json();
     document.querySelector("#logout-button").hidden = !status.authentication_required;
     if (!status.source_configured) {
-      setStatus("لم يُضبط مفتاح الاتصال بخدمة بيانات التطبيق الأصلي (COURT_API_KEY).", "error");
+      setStatus("تعذر إعداد ملف سجل القضايا في Google Drive.", "error");
       return;
     }
     setStatus("");
@@ -415,30 +392,6 @@ document.querySelector("#sessions-pdf").addEventListener("click", async () => {
   } catch (error) { showJsonError(error); }
 });
 
-document.querySelector("#case-sittings-form").addEventListener("submit", async (event) => {
-  event.preventDefault();
-  const form = event.currentTarget;
-  setLoading("جارٍ تحميل سجل جلسات القضية من الخدمة الأصلية…");
-  try {
-    const response = await postJson("/api/cases/sittings", {
-      query: form.elements.query.value,
-    });
-    renderRecordList(await response.json(), "رقم القضية", "لا توجد جلسات مسجلة لهذه القضية.");
-  } catch (error) { showJsonError(error); }
-});
-
-document.querySelector("#trustees-form").addEventListener("submit", async (event) => {
-  event.preventDefault();
-  const form = event.currentTarget;
-  setLoading("جارٍ البحث في سجل الأمناء الشرعيين الأصلي…");
-  try {
-    const response = await postJson("/api/legal-trustees/search", {
-      query: form.elements.query.value,
-    });
-    renderRecordList(await response.json(), "اسم الأمين الشرعي", "لا توجد نتائج مطابقة في السجل.");
-  } catch (error) { showJsonError(error); }
-});
-
 document.querySelector("#lookup-ad-case").addEventListener("click", async () => {
   const form = document.querySelector("#ad-form");
   if (!form.elements.case_type.value || !form.elements.judge_filter.value) {
@@ -449,7 +402,7 @@ document.querySelector("#lookup-ad-case").addEventListener("click", async () => 
     form.elements.case_number.reportValidity();
     return;
   }
-  setLoading("جارٍ البحث عن القضية في سجل التطبيق الأصلي…");
+  setLoading("جارٍ البحث عن القضية في ملف سجل القضايا…");
   try {
     const response = await postJson("/api/cases/search", {
       query: form.elements.case_number.value,
@@ -464,7 +417,7 @@ document.querySelector("#lookup-ad-case").addEventListener("click", async () => 
     form.elements.plaintiff.value = record["المدعي"] || "";
     form.elements.defendant.value = record["المدعى عليه"] || "";
     form.elements.judge.value = record["برئاسة القاضي"] || "";
-    setStatus("تم جلب بيانات القضية من مصدر المحكمة الأصلي. راجعها أو حرّرها قبل إنشاء الإعلان.");
+    setStatus("تم جلب بيانات القضية من ملف Google Drive. راجعها أو حرّرها قبل إنشاء الإعلان.");
   } catch (error) { showJsonError(error); }
 });
 
