@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#075b4c">
+  <title>تسجيل الدخول | محكمة البيضاء</title>
+  <style>
+    @font-face {
+      font-family: Sultan;
+      src: url("/assets/sultan-medium.ttf") format("truetype");
+      font-display: swap;
+    }
+    * { box-sizing: border-box; }
+    body {
+      min-height: 100vh;
+      margin: 0;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      background: #f3f7f5;
+      color: #173c32;
+      font-family: Sultan, Tahoma, sans-serif;
+    }
+    main {
+      width: min(100%, 420px);
+      padding: 32px;
+      border: 1px solid #dfe9e3;
+      border-radius: 24px;
+      background: #fff;
+      box-shadow: 0 18px 48px #123c2912;
+    }
+    img { display: block; width: 82px; height: 82px; object-fit: contain; margin: 0 auto 18px; }
+    h1 { margin: 0; text-align: center; font-size: 1.35rem; }
+    p { color: #60766d; text-align: center; line-height: 1.8; }
+    label { display: block; margin: 22px 0 8px; }
+    input, button { width: 100%; min-height: 48px; border-radius: 12px; font: inherit; }
+    input { border: 1px solid #d4dfd9; padding: 10px 13px; direction: ltr; text-align: left; }
+    button { margin-top: 16px; border: 0; background: #075b4c; color: #fff; cursor: pointer; }
+    #error { min-height: 28px; color: #a22d2d; }
+  </style>
+</head>
+<body>
+  <main>
+    <img src="/assets/albayda-it-logo.png" alt="شعار تقنية معلومات محكمة البيضاء الابتدائية">
+    <h1>تقنية معلومات محكمة البيضاء الابتدائية</h1>
+    <p>أدخل كلمة المرور المخصصة للوصول إلى الخدمات القضائية.</p>
+    <form id="login-form">
+      <label for="password">كلمة المرور</label>
+      <input id="password" name="password" type="password" autocomplete="current-password" required maxlength="256">
+      <button type="submit">تسجيل الدخول</button>
+      <p id="error" role="alert" aria-live="polite"></p>
+    </form>
+  </main>
+  <script>
+    const form = document.querySelector("#login-form");
+    const error = document.querySelector("#error");
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      error.textContent = "";
+      try {
+        const response = await fetch("/api/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ password: form.elements.password.value }),
+        });
+        const result = await response.json();
+        if (!response.ok) throw new Error(result.error || "تعذر تسجيل الدخول.");
+        window.location.replace("/");
+      } catch (reason) {
+        error.textContent = reason instanceof Error ? reason.message : "تعذر تسجيل الدخول.";
+      }
+    });
+  </script>
+</body>
+</html>

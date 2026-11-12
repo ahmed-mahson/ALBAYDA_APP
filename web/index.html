@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#075b4c">
+  <meta name="description" content="خدمات الاستعلام الإلكتروني عن القضايا والجلسات وإعلانات الحضور لمحكمة البيضاء الابتدائية.">
+  <title>albayda_court | محكمة البيضاء الابتدائية</title>
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="icon" href="/icons/icon-192.png" type="image/png">
+  <link rel="stylesheet" href="/styles.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="/" aria-label="الرئيسية">
+      <img src="/assets/albayda-it-logo.png" alt="شعار تقنية معلومات محكمة البيضاء الابتدائية">
+      <span><strong>تقنية معلومات محكمة البيضاء الابتدائية</strong><small>⚙️ النظام الإلكتروني المطور للاستعلام</small></span>
+    </a>
+    <button class="install-button" id="install-button" type="button" hidden>تثبيت التطبيق</button>
+    <button class="install-button" id="logout-button" type="button" hidden>تسجيل الخروج</button>
+  </header>
+
+  <main>
+    <section class="hero" aria-labelledby="page-title">
+      <div class="hero-copy">
+        <h1 id="page-title">اختر الخدمة المطلوبة</h1>
+      </div>
+    </section>
+
+    <section class="services" aria-label="الخدمات المتاحة">
+      <button class="service-card" type="button" data-open="case-panel" aria-label="الاستعلام عن قضية" aria-describedby="case-service-description">
+        <span class="service-icon service-icon--case" aria-hidden="true"><svg viewBox="0 0 64 64"><path d="M15 8h23l11 11v17"></path><path d="M38 9v12h12M15 8v48h23"></path><path d="M23 30h13m-13 8h9"></path><circle cx="43" cy="43" r="9"></circle><path d="m50 50 7 7"></path></svg></span>
+        <span class="card-title">الاستعلام عن قضية</span>
+        <span class="card-description" id="case-service-description">ابحث برقم القضية في سجل المحكمة الإلكتروني الأصلي.</span>
+        <span class="card-link">بدء الاستعلام <span aria-hidden="true">←</span></span>
+      </button>
+      <button class="service-card" type="button" data-open="sessions-panel" aria-label="قائمة الجلسات" aria-describedby="sessions-service-description">
+        <span class="service-icon service-icon--sessions" aria-hidden="true"><svg viewBox="0 0 64 64"><rect x="10" y="13" width="44" height="41" rx="8"></rect><path d="M20 9v9m24-9v9M10 26h44"></path><path d="M21 36h5m12 0h5M21 45h5m12 0h5"></path></svg></span>
+        <span class="card-title">قائمة الجلسات</span>
+        <span class="card-description" id="sessions-service-description">اعرض جلسات يوم محدد مع إمكانية تصفيتها حسب القاضي.</span>
+        <span class="card-link">عرض الجلسات <span aria-hidden="true">←</span></span>
+      </button>
+      <button class="service-card" type="button" data-open="case-sittings-panel" aria-label="جلسات قضية" aria-describedby="case-sittings-service-description">
+        <span class="service-icon service-icon--case-sittings" aria-hidden="true"><svg viewBox="0 0 64 64"><path d="M14 10h36v44H14zM22 20h20M22 29h20M22 38h9"></path><circle cx="42" cy="43" r="8"></circle><path d="m48 49 6 6"></path></svg></span>
+        <span class="card-title">جلسات قضية</span>
+        <span class="card-description" id="case-sittings-service-description">راجع سجل جلسات القضية من خدمة التطبيق الأصلي.</span>
+        <span class="card-link">بحث برقم القضية <span aria-hidden="true">←</span></span>
+      </button>
+      <button class="service-card" type="button" data-open="trustees-panel" aria-label="الأمناء الشرعيون" aria-describedby="trustees-service-description">
+        <span class="service-icon service-icon--trustees" aria-hidden="true"><svg viewBox="0 0 64 64"><circle cx="24" cy="20" r="10"></circle><path d="M7 53v-5c0-9 7-15 17-15s17 6 17 15v5M44 17h13M44 25h13M44 33h9"></path></svg></span>
+        <span class="card-title">الأمناء الشرعيون</span>
+        <span class="card-description" id="trustees-service-description">ابحث بالاسم أو رقم الترخيص ضمن سجل الأمناء.</span>
+        <span class="card-link">بحث في السجل <span aria-hidden="true">←</span></span>
+      </button>
+      <button class="service-card" type="button" data-open="ad-panel" aria-label="إعلان حضور جلسة" aria-describedby="ad-service-description">
+        <span class="service-icon service-icon--ad" aria-hidden="true"><svg viewBox="0 0 64 64"><path d="M15 8h23l11 11v15"></path><path d="M38 9v12h12M15 8v48h23"></path><path d="M22 31h15m-15 8h12"></path><path d="m39 49 12-12 5 5-12 12-7 2z"></path></svg></span>
+        <span class="card-title">إعلان حضور جلسة</span>
+        <span class="card-description" id="ad-service-description">أنشئ إعلان الحضور، راجع بياناته وحرّرها ثم نزّل PDF.</span>
+        <span class="card-link">إنشاء إعلان <span aria-hidden="true">←</span></span>
+      </button>
+      <button class="service-card" type="button" data-open="supreme-panel" aria-label="المحكمة العليا" aria-describedby="supreme-service-description">
+        <span class="service-icon service-icon--supreme" aria-hidden="true"><svg viewBox="0 0 64 64"><path d="M8 24 32 10l24 14M12 53h40M17 25v22m10-22v22m10-22v22m10-22v22M9 49h46"></path></svg></span>
+        <span class="card-title">المحكمة العليا</span>
+        <span class="card-description" id="supreme-service-description">استعلم عن الطعون والالتماسات في موقع المحكمة العليا.</span>
+        <span class="card-link">بحث في القضايا <span aria-hidden="true">←</span></span>
+      </button>
+    </section>
+
+    <section class="workspace" aria-live="polite">
+      <div class="workspace-heading">
+        <div><p class="eyebrow">بوابتك الرقمية</p><h2 id="workspace-title">خدمات الاستعلام والبحث</h2></div>
+        <span class="heading-rule" aria-hidden="true"></span>
+      </div>
+
+      <section class="tool-panel" id="case-panel" hidden>
+        <p class="panel-note">كما في البحث المباشر بالبوت: أدخل رقم القضية أو اسم المدعي أو المدعى عليه. ويمكن تضييق النتائج حسب نوع القضية والقاضي من سجل التطبيق الأصلي.</p>
+        <form id="case-form" class="form-grid">
+          <label class="field">نوع القضية
+            <select name="case_type" id="case-search-type" required>
+              <option value="all">جميع الأقسام</option>
+            </select>
+          </label>
+          <label class="field">القاضي
+            <select name="judge" id="case-search-judge" required>
+              <option value="all">كافة القضاة</option>
+            </select>
+          </label>
+          <label class="field">طريقة البحث
+            <select name="method" id="case-search-method">
+              <option value="auto">تلقائي: رقم القضية أو اسم أحد الأطراف</option>
+              <option value="number">رقم القضية</option>
+              <option value="name">اسم المدعي أو المدعى عليه</option>
+            </select>
+          </label>
+          <label class="field field-wide">رقم القضية أو اسم المدعي/المدعى عليه
+            <input id="case-query" name="query" placeholder="مثال: 1446/25 أو اسم أحد الأطراف" maxlength="100" required>
+          </label>
+          <div class="field-actions"><button class="primary-button" type="submit">بحث عن القضية</button></div>
+        </form>
+      </section>
+
+      <section class="tool-panel" id="sessions-panel" hidden>
+        <p class="panel-note">اختر القاضي أو جميع القضاة أولاً، ثم أدخل التاريخ أو «اليوم» كما في البوت.</p>
+        <form id="sessions-form" class="form-grid">
+          <label class="field">القاضي
+            <select id="session-judge" name="judge" required>
+              <option value="all">جميع القضاة</option>
+            </select>
+          </label>
+          <label class="field">تاريخ الجلسة
+            <input id="session-date" name="date" type="text" maxlength="20" placeholder="YYYY-MM-DD أو YYYY/MM/DD أو اليوم" required>
+          </label>
+          <div class="field-actions actions-inline">
+            <button class="primary-button" type="submit">استعلام</button>
+            <button class="secondary-button" id="sessions-pdf" type="button">تنزيل قائمة PDF</button>
+          </div>
+        </form>
+      </section>
+
+      <section class="tool-panel" id="case-sittings-panel" hidden>
+        <p class="panel-note">أدخل رقم القضية كما في البوت؛ يقبل البحث الأرقام العربية أو الإنجليزية وصيغتي السنة/الرقم أو الرقم/السنة.</p>
+        <form id="case-sittings-form" class="form-grid">
+          <label class="field field-wide">رقم القضية
+            <input name="query" maxlength="40" placeholder="مثال: 1446/25" required>
+          </label>
+          <div class="field-actions"><button class="primary-button" type="submit">بحث عن جلسات القضية</button></div>
+        </form>
+      </section>
+
+      <section class="tool-panel" id="trustees-panel" hidden>
+        <form id="trustees-form" class="form-grid">
+          <label class="field field-wide">اسم الأمين الشرعي أو رقم الترخيص
+            <input name="query" maxlength="100" placeholder="أدخل الاسم أو رقم الترخيص" required>
+          </label>
+          <div class="field-actions"><button class="primary-button" type="submit">بحث في سجل الأمناء</button></div>
+        </form>
+      </section>
+
+      <section class="tool-panel" id="ad-panel" hidden>
+        <p class="panel-note">كما في البوت، اختر نوع القضية ثم القاضي، وأدخل رقم القضية وتاريخ الجلسة. تُجلب بيانات القضية من خدمة التطبيق الأصلي ويمكنك مراجعتها وتحريرها قبل تنزيل الإعلان.</p>
+        <form id="ad-form" class="form-grid">
+          <label class="field">نوع القضية
+            <select name="case_type" id="ad-case-type" required>
+              <option value="">اختر نوع القضية</option>
+            </select>
+          </label>
+          <label class="field">القاضي المختص
+            <select name="judge_filter" id="ad-judge-filter" required>
+              <option value="">اختر القاضي</option>
+            </select>
+          </label>
+          <label class="field">رقم القضية<input id="ad-case-number" name="case_number" required maxlength="40" placeholder="مثال: 1446/25"></label>
+          <label class="field">تاريخ الجلسة<input name="session_date" type="text" maxlength="20" placeholder="YYYY-MM-DD أو YYYY/MM/DD أو اليوم" required></label>
+          <div class="field-actions"><button class="secondary-button" id="lookup-ad-case" type="button">جلب بيانات القضية من سجل المحكمة</button></div>
+          <label class="field">المدعي<input name="plaintiff" required maxlength="200"></label>
+          <label class="field">المدعى عليه<input name="defendant" required maxlength="200"></label>
+          <label class="field field-wide">القاضي في الإعلان (قابل للتحرير)<input name="judge" required maxlength="160"></label>
+          <div class="field-actions"><button class="primary-button" type="submit">إنشاء الإعلان وتنزيله</button></div>
+        </form>
+      </section>
+
+      <section class="tool-panel" id="supreme-panel" hidden>
+        <form id="supreme-form" class="form-grid">
+          <label class="field">اسم الطاعن أو الملتمس<input name="name" maxlength="100" placeholder="اكتب الاسم للبحث"></label>
+          <label class="field">رقم الحكم<input name="decision_number" inputmode="numeric" maxlength="30" placeholder="اختياري"></label>
+          <label class="field">نوع القضية
+            <select name="case_type"><option value="0">الكل</option><option value="طعن">طعن</option><option value="التماس">التماس</option></select>
+          </label>
+          <label class="field">جهة الاستئناف
+            <select name="authority"><option value="0">جميع الجهات</option></select>
+          </label>
+          <div class="field-actions actions-inline">
+            <button class="primary-button" type="submit">بحث في المحكمة العليا</button>
+            <button class="secondary-button" id="supreme-pdf" type="button">تنزيل التقرير PDF</button>
+          </div>
+        </form>
+      </section>
+
+      <div id="status-message" class="status-message" role="status" hidden></div>
+      <div id="results" class="results" hidden></div>
+    </section>
+
+    <aside class="notice-strip">
+      <span class="notice-mark" aria-hidden="true">!</span>
+      <span><strong>تنويه:</strong> تعرض النتائج البيانات المتاحة في السجل الإلكتروني الرسمي وقت الاستعلام.</span>
+    </aside>
+  </main>
+
+  <footer class="footer">
+    <img src="/assets/albayda-it-logo.png" alt="" aria-hidden="true">
+    <p>تقنية معلومات محكمة البيضاء الابتدائية</p>
+    <p class="credit">برمجة وتصميم / المهندس أحمد حسين محسون</p>
+    <div class="contact"><a href="https://wa.me/qr/QIQRW7LA325GG1" target="_blank" rel="noopener noreferrer">واتساب</a><a href="https://t.me/Ahmed_Mahson" target="_blank" rel="noopener noreferrer">تيليجرام</a><a href="tel:734840710">734840710</a><a href="tel:771421919">771421919</a></div>
+  </footer>
+  <div id="toast" class="toast" role="alert" hidden></div>
+</body>
+</html>

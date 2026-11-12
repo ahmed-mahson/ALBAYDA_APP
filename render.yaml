@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: albayda-court
+    runtime: docker
+    plan: free
+    healthCheckPath: /healthz
+    envVars:
+      - key: APP_REQUIRE_AUTH
+        value: "true"
+      - key: PORT
+        value: "10000"
+      - key: ALBAYDA_HOST
+        value: "0.0.0.0"
+      - key: COURT_API_BASE_URL
+        sync: false
+      - key: COURT_API_KEY
+        sync: false
+      - key: APP_ACCESS_PASSWORD
+        sync: false
+      - key: APP_SESSION_SECRET
+        sync: false
