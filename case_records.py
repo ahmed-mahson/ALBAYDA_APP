@@ -4,6 +4,7 @@ import os
 import re
 import threading
 import time
+import tempfile
 import unicodedata
 from datetime import datetime, timedelta, timezone
 from html.parser import HTMLParser
@@ -358,14 +359,50 @@ def _download_case_csv():
     return content
 
 
+def _read_case_source():
+    local_file = os.getenv('CASE_RECORDS_LOCAL_FILE', '').strip()
+    if not local_file:
+        return _download_case_csv()
+    try:
+        with Path(local_file).open('rb') as source:
+            content = source.read(MAX_CSV_BYTES + 1)
+    except OSError as exc:
+        raise CaseRecordsError('تعذر قراءة ملف سجل القضايا المحلي المُعدّ.') from exc
+    if len(content) > MAX_CSV_BYTES:
+        raise CaseRecordsError('ملف سجل القضايا يتجاوز الحد المسموح للحجم.')
+    return content
+
+
+def _save_case_snapshot(content):
+    filename = os.getenv('CASE_RECORDS_SNAPSHOT_PATH', '').strip()
+    if not filename:
+        return
+    path = Path(filename).resolve()
+    temporary = None
+    try:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        with tempfile.NamedTemporaryFile(dir=path.parent, delete=False) as target:
+            temporary = Path(target.name)
+            target.write(content)
+            target.flush()
+            os.fsync(target.fileno())
+        temporary.replace(path)
+    except OSError as exc:
+        raise CaseRecordsError('تعذر حفظ النسخة الدائمة لسجل القضايا؛ تحقق من صلاحيات التخزين.') from exc
+    finally:
+        if temporary is not None:
+            temporary.unlink(missing_ok=True)
+
+
 def load_case_records():
     global _records_cache, _records_cache_expires_at
     with _records_cache_lock:
         if _records_cache is not None and time.monotonic() < _records_cache_expires_at:
             return _records_cache
 
-    content = _download_case_csv()
+    content = _read_case_source()
     records = _parse_case_records(content)
+    _save_case_snapshot(content)
 
     with _records_cache_lock:
         _records_cache = records
@@ -460,6 +497,23 @@ def search_case_records(records, query, method, case_type='all', judge='all', li
             if len(matches) >= limit:
                 break
     return matches
+
+
+def find_exact_case(records, case_number, case_type='all', judge='all'):
+    """Resolve a report target without truncating partial search results."""
+    number = _normalize_case_number(case_number)
+    numbers = {number}
+    if number.count('/') == 1:
+        numbers.add('/'.join(reversed(number.split('/'))))
+    for record in records:
+        if _normalize_case_number(record.get('رقم القضية', '')) not in numbers:
+            continue
+        if case_type != 'all' and not case_type_matches(record.get('نوع القضية'), case_type):
+            continue
+        if judge != 'all' and normalize_judge_name(record.get('برئاسة القاضي')) != normalize_judge_name(judge):
+            continue
+        return record
+    return None
 
 
 def _normalized_date(value):
@@ -1617,12 +1671,6 @@ def generate_attendance_ad_pdf(case_number, plaintiff, defendant, session_date, 
         ATTENDANCE_TEMPLATE,
         template_layout='attendance_ad',
     )
-
-
-# دالتان إضافيتان مطلوبة من ملفات الاختبار الآلي لتفادي أخطاء الـ AttributeError
-def _shape_pdf_text(value, font_size):
-    text = _render_pdf_text(value)
-    return shapeStr(text, _pdf_font_for_text(text), font_size)
 
 
 __all__ = [

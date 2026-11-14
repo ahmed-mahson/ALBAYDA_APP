@@ -1,0 +1,34 @@
+<!doctype html><html lang="ar" dir="rtl"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>تقنية معلومات محكمة البيضاء الابتدائية</title><link rel="stylesheet" href="/style.css">
+<body><header><img src="/assets/albayda-it-logo.webp" alt="شعار المحكمة"><div><h1>تقنية معلومات محكمة البيضاء الابتدائية</h1><p>الاستعلام عن القضايا والجلسات</p></div></header><main>
+<nav aria-label="الخدمات"><button data-tab="cases">بحث القضايا</button><button data-tab="sessions">قائمة الجلسات</button><button data-tab="attendance">إعلان حضور</button><button data-tab="supreme">المحكمة العليا</button><button id="logout" class="secondary">تسجيل الخروج</button></nav>
+<div id="notice" role="status" aria-live="polite"></div>
+<section id="cases"><h2>بحث القضايا</h2><form id="case-search"><label>رقم القضية أو اسم أحد الأطراف<input name="query" required maxlength="100"></label><label>طريقة البحث<select name="method"><option value="auto">تلقائي</option><option value="number">رقم القضية</option><option value="name">اسم المدعي أو المدعى عليه</option></select></label><label>نوع القضية<select name="case_type" data-types></select></label><label>القاضي<select name="judge" data-judges></select></label><button>بحث</button></form><p class="hint">يُعرض حتى خمس نتائج لكل بحث. يمكن إدخال الأرقام العربية أو الإنجليزية ورقم القضية بالترتيبين.</p></section>
+<section id="sessions" hidden><h2>قائمة الجلسات اليومية</h2><form id="session-search"><label>تاريخ الجلسة<input name="date" type="date" required></label><label>القاضي<select name="judge" data-judges></select></label><button>عرض الجلسات</button><button type="button" data-download="/api/sessions/pdf">تنزيل القائمة PDF</button></form></section>
+<section id="attendance" hidden><h2>إعلان حضور</h2><p class="hint">اختر القضية من نتائج البحث لتعبئة النموذج، ثم راجع الأطراف والتاريخ قبل التنزيل.</p><form id="attendance-form"><label>رقم القضية<input name="case_number" required maxlength="40"></label><label>نوع القضية<select name="case_type" data-types required></select></label><label>القاضي المختص<select name="judge_filter" data-judges required></select></label><label>اسم القاضي في الإعلان<input name="judge" required maxlength="160"></label><label>المدعي<input name="plaintiff" required maxlength="200"></label><label>المدعى عليه<input name="defendant" required maxlength="200"></label><label>تاريخ الجلسة<input name="session_date" type="date" required></label><button>تنزيل إعلان PDF</button></form></section>
+<section id="supreme" hidden><h2>بحث المحكمة العليا</h2><form id="supreme-search"><label>اسم الطاعن أو الملتمس<input name="name" maxlength="100"></label><label>رقم الحكم<input name="decision_number" inputmode="numeric" maxlength="30"></label><label>نوع البحث<select name="case_type"><option value="0">الكل</option><option value="طعن">طعن</option><option value="التماس">التماس</option></select></label><label>جهة الاستئناف<select name="authority">
+			<option selected value="0">الكل</option>
+			<option value="1">الأمانة</option>
+			<option value="2">عدن</option>
+			<option value="3">صنعاءوالجوف</option>
+			<option value="4">تعز</option>
+			<option value="5">حضرموت</option>
+			<option value="6">الحديدة</option>
+			<option value="7">إب</option>
+			<option value="8">لحج</option>
+			<option value="9">حجه</option>
+			<option value="10">الضالع</option>
+			<option value="11">ذمار</option>
+			<option value="12">البيضاء</option>
+			<option value="13">أبين</option>
+			<option value="14">عمران</option>
+			<option value="15">صعده</option>
+			<option value="16">شبوه</option>
+			<option value="17">المهره</option>
+			<option value="18">المحويت</option>
+			<option value="19">مأرب</option>
+			<option value="20">ريمه</option>
+			<option value="21">النائب العام</option>
+			<option value="22">المحكمة الاستئنافية المتخصصة</option>
+			<option value="23">المحكمة الاستئنافية العسكرية</option>
+			</select></label><button>بحث</button><button type="button" data-download="/api/supreme-court/report">تنزيل النتائج PDF</button></form><p class="hint">المصدر: موقع المحكمة العليا اليمنية ysc.org.ye؛ تُجلب النتائج مباشرة عند البحث.</p></section>
+<div id="results"></div></main><footer>مصدر القضايا والجلسات: سجل Google Drive المعتمد · تحديث الذاكرة المؤقتة كل خمس دقائق · توقيت اليمن UTC+3</footer><script src="/app.js" defer></script></body></html>

@@ -104,11 +104,13 @@ def _is_authenticated(environ):
         if separator:
             cookies[name] = value
     issued_text, separator, signature = cookies.get(AUTH_COOKIE_NAME, "").partition(".")
-    if not separator or not issued_text.isdecimal():
+    if not separator or not issued_text.isascii() or not issued_text.isdecimal() or len(issued_text) > 12:
         return False
     issued_at = int(issued_text)
     now = int(time.time())
     if issued_at > now + 60 or now - issued_at > SESSION_MAX_AGE_SECONDS:
+        return False
+    if not re.fullmatch(r'[0-9a-f]{64}', signature):
         return False
     expected = _session_signature(issued_text, secret)
     return hmac.compare_digest(signature, expected)
@@ -136,7 +138,7 @@ def _login(payload, environ, start_response):
             [("Retry-After", str(LOGIN_WINDOW_SECONDS))],
         )
     password = _text(payload, "password", "كلمة المرور", required=True, limit=256)
-    if not hmac.compare_digest(password, expected_password):
+    if not hmac.compare_digest(password.encode('utf-8'), expected_password.encode('utf-8')):
         return _json_response(
             start_response,
             HTTPStatus.UNAUTHORIZED,
@@ -346,20 +348,8 @@ def _post_api(path, payload, start_response):
         case_number = _text(
             payload, "case_number", "رقم القضية", required=True, limit=40
         )
-        normalized_number = case_records._normalize_case_number(case_number)
-        records = case_records.search_case_records(
-            case_records.load_case_records(),
-            case_number,
-            "number",
-            limit=100,
-        )
-        record = next(
-            (
-                row for row in records
-                if case_records._normalize_case_number(row.get("رقم القضية", ""))
-                == normalized_number
-            ),
-            None,
+        record = case_records.find_exact_case(
+            case_records.load_case_records(), case_number
         )
         if record is None:
             return _json_response(
@@ -398,27 +388,9 @@ def _post_api(path, payload, start_response):
         )
         plaintiff = _text(payload, "plaintiff", "اسم المدعي", required=True, limit=200)
         defendant = _text(payload, "defendant", "اسم المدعى عليه", required=True, limit=200)
-        matches = case_records.search_case_records(
-            case_records.load_case_records(),
-            case_number,
-            "number",
-            case_type=case_type,
-            judge=judge_filter,
-            limit=1,
-        )
-        normalized_number = case_records._normalize_case_number(case_number)
-        record = next(
-            (
-                item for item in matches
-                if case_records._normalize_case_number(item.get("رقم القضية", ""))
-                in {
-                    normalized_number,
-                    "/".join(reversed(normalized_number.split("/")))
-                    if normalized_number.count("/") == 1
-                    else normalized_number,
-                }
-            ),
-            None,
+        record = case_records.find_exact_case(
+            case_records.load_case_records(), case_number,
+            case_type=case_type, judge=judge_filter,
         )
         if record is None:
             raise CaseRecordsError(
@@ -449,13 +421,17 @@ def _post_api(path, payload, start_response):
 def _static_file(path, start_response):
     if path in {"", "/"}:
         path = "/index.html"
-    requested = (WEB_ROOT / unquote(path.lstrip("/"))).resolve()
+    root = case_records.ASSETS_DIR.resolve() if path.startswith('/assets/') else WEB_ROOT.resolve()
+    relative = path[len('/assets/'):] if path.startswith('/assets/') else path.lstrip('/')
+    requested = (root / unquote(relative)).resolve()
     try:
-        requested.relative_to(WEB_ROOT.resolve())
+        requested.relative_to(root)
     except ValueError:
         return _json_response(
-            start_response, HTTPStatus.NOT_FOUND, {"error": "الملف غير موجود."}
+            start_response, HTTPStatus.NOT_FOUND, {'error': 'الملف غير موجود.'}
         )
+    if path.startswith('/assets/') and requested.suffix not in {'.webp', '.png', '.ttf'}:
+        return _json_response(start_response, HTTPStatus.NOT_FOUND, {'error': 'الملف غير موجود.'})
     if not requested.is_file():
         return _json_response(
             start_response, HTTPStatus.NOT_FOUND, {"error": "الملف غير موجود."}
@@ -513,7 +489,7 @@ def application(environ, start_response):
             [("Set-Cookie", cookie)],
         )
     public_login_assets = {
-        "/assets/albayda-it-logo.png",
+        "/assets/albayda-it-logo.webp",
         "/assets/sultan-medium.ttf",
     }
     if (
@@ -579,13 +555,7 @@ def application(environ, start_response):
     return _static_file(path, start_response)
 
 
-def main():
-    logging.basicConfig(
-        level=os.getenv("LOG_LEVEL", "INFO").upper(),
-        format="%(asctime)s %(levelname)s %(message)s",
-    )
-    host = os.getenv("ALBAYDA_HOST", "127.0.0.1")
-    port = int(os.getenv("PORT", "8080"))
+def validate_configuration():
     if _auth_required():
         missing = [
             key for key in ("APP_ACCESS_PASSWORD", "APP_SESSION_SECRET")
@@ -599,6 +569,16 @@ def main():
             raise RuntimeError("APP_ACCESS_PASSWORD must contain at least 12 characters.")
         if len(os.getenv("APP_SESSION_SECRET", "")) < 32:
             raise RuntimeError("APP_SESSION_SECRET must contain at least 32 characters.")
+
+
+def main():
+    logging.basicConfig(
+        level=os.getenv('LOG_LEVEL', 'INFO').upper(),
+        format='%(asctime)s %(levelname)s %(message)s',
+    )
+    validate_configuration()
+    host = os.getenv('ALBAYDA_HOST', '127.0.0.1')
+    port = int(os.getenv('PORT', '8080'))
     with make_server(host, port, application, server_class=ThreadingWSGIServer) as server:
         LOGGER.info("albayda_court is listening on http://%s:%s", host, port)
         try:

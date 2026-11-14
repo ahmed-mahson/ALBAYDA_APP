@@ -1,0 +1,19 @@
+plugins { id 'com.android.application' }
+def courtUrl = providers.gradleProperty('appUrl').getOrElse('')
+def parsedUrl = new URI(courtUrl)
+if (courtUrl && (parsedUrl.scheme != 'https' || !parsedUrl.host || parsedUrl.userInfo || parsedUrl.query || parsedUrl.fragment || !(parsedUrl.path in ['', '/']))) {
+    throw new GradleException('appUrl must be an HTTPS origin, for example https://court.example.org/')
+}
+android {
+    namespace 'ye.albayda.court'
+    compileSdk 35
+    defaultConfig {
+        applicationId 'ye.albayda.court'
+        minSdk 29
+        targetSdk 35
+        versionCode 1
+        versionName '1.0.0'
+        buildConfigField 'String', 'APP_URL', '"' + courtUrl + '"'
+    }
+    buildFeatures { buildConfig true }
+}

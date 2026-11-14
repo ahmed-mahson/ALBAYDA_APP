@@ -1,0 +1,11 @@
+.env
+.venv/
+__pycache__/
+*.pyc
+*.log
+.gradle/
+**/build/
+local.properties
+*.jks
+data/*.csv
+data/*.sqlite*
