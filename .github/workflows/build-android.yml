@@ -5,7 +5,7 @@ on:
     paths: ['android/**', '.github/workflows/build-android.yml']
   workflow_dispatch:
 permissions:
-  contents: read
+  contents: write
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -27,6 +27,15 @@ jobs:
           key: court-android-signing-v140
       - run: gradle --no-daemon :app:assembleDebug
         working-directory: android
+      - name: Save installable APK in private repository
+        run: |
+          mkdir -p builds
+          cp android/app/build/outputs/apk/debug/app-debug.apk builds/ALBAYDA-COURT-v1.4.apk
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add builds/ALBAYDA-COURT-v1.4.apk
+          git commit -m 'Store installable ALBAYDA 1.4 APK'
+          git push origin HEAD:main
       - uses: actions/upload-artifact@v4
         with:
           name: ALBAYDA-COURT-v1.4
