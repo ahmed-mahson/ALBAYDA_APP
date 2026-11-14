@@ -95,6 +95,8 @@ def _login_is_limited(client_ip):
 
 
 def _is_authenticated(environ):
+    if environ.get('court.authenticated'):
+        return True
     secret = os.getenv("APP_SESSION_SECRET", "")
     if not secret:
         return False
@@ -460,6 +462,13 @@ def _static_file(path, start_response):
 
 
 def application(environ, start_response):
+    if os.getenv('COURT_MULTIUSER') == 'true':
+        import accounts, sys
+        return accounts.handle(sys.modules[__name__], _legacy_application, environ, start_response)
+    return _legacy_application(environ, start_response)
+
+
+def _legacy_application(environ, start_response):
     path = unquote(environ.get("PATH_INFO", "/"))
     method = environ.get("REQUEST_METHOD", "GET").upper()
     if path == "/healthz" and method == "GET":

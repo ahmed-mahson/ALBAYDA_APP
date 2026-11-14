@@ -1,11 +1,9 @@
 name: Build Android APK
 on:
+  push:
+    branches: [main]
+    paths: ['android/**', '.github/workflows/build-android.yml']
   workflow_dispatch:
-    inputs:
-      app_url:
-        description: HTTPS service origin; leave empty to configure it inside the APK
-        required: false
-        type: string
 permissions:
   contents: read
 jobs:
@@ -20,18 +18,17 @@ jobs:
       - uses: android-actions/setup-android@v3
         with:
           packages: 'platform-tools platforms;android-35 build-tools;35.0.0'
-          log-accepted-android-sdk-licenses: false
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.9'
-      - name: Build installable APK
+      - uses: actions/cache@v4
+        with:
+          path: ~/.android/debug.keystore
+          key: court-android-signing-v140
+      - run: gradle --no-daemon :app:assembleDebug
         working-directory: android
-        env:
-          APP_URL: ${{ inputs.app_url }}
-        run: gradle --no-daemon :app:assembleDebug "-PappUrl=$APP_URL"
       - uses: actions/upload-artifact@v4
         with:
-          name: albayda-court-debug-apk
+          name: ALBAYDA-COURT-v1.4
           path: android/app/build/outputs/apk/debug/app-debug.apk
-          if-no-files-found: error
           retention-days: 30
