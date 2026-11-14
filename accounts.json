@@ -20,6 +20,13 @@
       "user": "admin",
       "action": "storage-verification",
       "result": "success"
+    },
+    {
+      "id": "8532be8c29854aeba5c9aa563179fd03",
+      "time": "2026-11-14T22:15:27.928902+00:00",
+      "user": "admin",
+      "action": "login",
+      "result": "success"
     }
   ]
 }
