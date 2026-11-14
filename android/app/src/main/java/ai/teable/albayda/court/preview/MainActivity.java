@@ -87,7 +87,6 @@ public class MainActivity extends Activity {
         getWindow().setStatusBarColor(NAVY);
         getWindow().setNavigationBarColor(NAVY);
         getWindow().setSoftInputMode(16);
-        enterFullscreen();
         final LinearLayout linearLayout = new LinearLayout(this);
         linearLayout.setOrientation(1);
         linearLayout.setBackgroundColor(NAVY);
@@ -160,6 +159,7 @@ public class MainActivity extends Activity {
         frameLayout.addView(this.errorPanel, new FrameLayout.LayoutParams(-1, -1));
         this.errorPanel.setVisibility(8);
         setContentView(linearLayout);
+        linearLayout.post(this::enterFullscreen);
         if (Build.VERSION.SDK_INT < 30) {
             linearLayout.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() { // from class: ai.teable.albayda.court.preview.MainActivity$$ExternalSyntheticLambda3
                 @Override // android.view.ViewTreeObserver.OnGlobalLayoutListener
@@ -478,8 +478,10 @@ public class MainActivity extends Activity {
     }
 
     private void enterFullscreen() {
+        // getDecorView initializes PhoneWindow's decor; getInsetsController alone does not.
+        View decor = getWindow().getDecorView();
         if (Build.VERSION.SDK_INT >= 30) {
-            WindowInsetsController insetsController = getWindow().getInsetsController();
+            WindowInsetsController insetsController = decor.getWindowInsetsController();
             if (insetsController != null) {
                 insetsController.setSystemBarsBehavior(2);
                 insetsController.hide(WindowInsets.Type.systemBars());
@@ -487,7 +489,7 @@ public class MainActivity extends Activity {
             }
             return;
         }
-        getWindow().getDecorView().setSystemUiVisibility(4358);
+        decor.setSystemUiVisibility(4358);
     }
 
     @Override // android.app.Activity, android.view.Window.Callback
