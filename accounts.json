@@ -13,5 +13,13 @@
       "locked_until": 0
     }
   },
-  "events": []
+  "events": [
+    {
+      "id": "setup-check",
+      "time": "2026-11-14T22:15:00Z",
+      "user": "admin",
+      "action": "storage-verification",
+      "result": "success"
+    }
+  ]
 }
