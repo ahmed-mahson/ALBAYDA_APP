@@ -1,0 +1,64 @@
+name: Android startup hotfix
+on:
+  push:
+    paths:
+      - .github/workflows/android-startup-hotfix.yml
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  fix-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Apply reviewed patch
+        run: |
+          python scripts/fix_android_startup.py
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add android/app/src/main/java/ai/teable/albayda/court/preview/MainActivity.java android/app/build.gradle
+          git commit -m 'Fix fullscreen startup crash before decor creation; bump to 1.3.1'
+          git push origin HEAD:main
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v3
+        with:
+          packages: 'platform-tools platforms;android-35 build-tools;35.0.0'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+      - name: Build APK
+        working-directory: android
+        run: gradle --no-daemon :app:assembleDebug
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - name: Cold launch and resume on Android 11
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 30
+          arch: x86_64
+          disable-animations: true
+          script: |
+            adb install android/app/build/outputs/apk/debug/app-debug.apk
+            adb logcat -c
+            adb shell am start -W -n ai.teable.albayda.court.preview/.MainActivity
+            sleep 5
+            adb shell pidof ai.teable.albayda.court.preview
+            adb shell input keyevent KEYCODE_HOME
+            adb shell am start -W -n ai.teable.albayda.court.preview/.MainActivity
+            sleep 3
+            adb shell pidof ai.teable.albayda.court.preview
+            adb logcat -d -b crash > startup-crash.log
+            test ! -s startup-crash.log
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ALBAYDA-COURT-v1.3.1-validation
+          path: |
+            android/app/build/outputs/apk/debug/app-debug.apk
+            startup-crash.log
