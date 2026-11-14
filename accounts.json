@@ -34,6 +34,13 @@
       "user": "admin",
       "action": "login",
       "result": "success"
+    },
+    {
+      "id": "7acc17126f404354be009c617d925834",
+      "time": "2026-11-14T22:20:48.412597+00:00",
+      "user": "admin",
+      "action": "login",
+      "result": "success"
     }
   ]
 }
