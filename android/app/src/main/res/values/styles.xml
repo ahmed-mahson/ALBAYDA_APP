@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="CourtTheme" parent="@android:style/Theme.Material.Light.NoActionBar">
+        <item name="android:windowBackground">#ff031d40</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowActionModeOverlay">true</item>
+        <item name="android:fontFamily">sans</item>
+        <item name="android:colorAccent">#ffc4a761</item>
+        <item name="android:statusBarColor">#ff031d40</item>
+        <item name="android:navigationBarColor">#ff031d40</item>
+        <item name="android:windowLightStatusBar">false</item>
+    </style>
+</resources>

@@ -491,6 +491,7 @@ def application(environ, start_response):
     public_login_assets = {
         "/assets/albayda-it-logo.webp",
         "/assets/sultan-medium.ttf",
+        "/login.js",
     }
     if (
         _auth_required()
