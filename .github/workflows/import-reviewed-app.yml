@@ -19,27 +19,28 @@ jobs:
           python - <<'PY'
           import hashlib, os, pathlib, urllib.request, zipfile, io
           raw = urllib.request.urlopen(os.environ['BUNDLE_URL'], timeout=60).read(10000000)
-          expected = 'cebffa90f8bd1ae1adac25900780a041a1c2ca88248220f18800c4c4d042a595'
-          if hashlib.sha256(raw).hexdigest() != expected:
+          if hashlib.sha256(raw).hexdigest() != 'cebffa90f8bd1ae1adac25900780a041a1c2ca88248220f18800c4c4d042a595':
               raise RuntimeError('Source bundle checksum mismatch')
           root = pathlib.Path.cwd().resolve()
           with zipfile.ZipFile(io.BytesIO(raw)) as archive:
               for member in archive.infolist():
                   target = (root / member.filename).resolve()
-                  target.relative_to(root)
-                  if '.git' in target.relative_to(root).parts:
+                  relative = target.relative_to(root)
+                  if '.git' in relative.parts:
                       raise RuntimeError('Invalid archive path')
+                  if member.filename.startswith('.github/workflows/'):
+                      continue
                   if not member.is_dir():
                       target.parent.mkdir(parents=True, exist_ok=True)
                       target.write_bytes(archive.read(member))
-          print('Verified source and private case snapshot extracted.')
+          print('Verified source and private snapshot extracted; workflows managed separately.')
           PY
-      - name: Install dependencies and validate application
+      - name: Validate application
         run: |
           pip install -r requirements.txt
           python -m unittest discover -s tests -v
           node --check web/app.js
-      - name: Commit reviewed source and private data snapshot
+      - name: Commit reviewed source and private snapshot
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
