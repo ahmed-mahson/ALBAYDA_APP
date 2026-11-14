@@ -6,7 +6,7 @@ permissions:
 jobs:
   import:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -19,7 +19,7 @@ jobs:
           python - <<'PY'
           import hashlib, os, pathlib, urllib.request, zipfile, io
           raw = urllib.request.urlopen(os.environ['BUNDLE_URL'], timeout=60).read(10000000)
-          if hashlib.sha256(raw).hexdigest() != 'cebffa90f8bd1ae1adac25900780a041a1c2ca88248220f18800c4c4d042a595':
+          if hashlib.sha256(raw).hexdigest() != 'ff8e9007d8c9966ee8390d533f845f6d07cc4ee4d8223e00a0567d9c2bad4f2b':
               raise RuntimeError('Source bundle checksum mismatch')
           root = pathlib.Path.cwd().resolve()
           with zipfile.ZipFile(io.BytesIO(raw)) as archive:
@@ -33,20 +33,38 @@ jobs:
                   if not member.is_dir():
                       target.parent.mkdir(parents=True, exist_ok=True)
                       target.write_bytes(archive.read(member))
-          print('Verified source and private snapshot extracted; workflows managed separately.')
+          print('Verified v1.2-derived source and private data extracted.')
           PY
       - name: Validate application
         run: |
           pip install -r requirements.txt
           python -m unittest discover -s tests -v
           node --check web/app.js
-      - name: Commit reviewed source and private snapshot
+          node --check web/login.js
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v3
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+      - name: Build corrected original application
+        working-directory: android
+        run: gradle --no-daemon :app:assembleDebug
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ALBAYDA-COURT-v1.3-apk
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+          retention-days: 30
+      - name: Commit corrected original application
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add .
           git add -f data/sercase.csv data/snapshot-info.json
           if ! git diff --cached --quiet; then
-            git commit -m 'Complete court app, original templates, transparent icon and private record storage'
+            git commit -m 'Restore uploaded v1.2 native features, biometric login and transparent logo'
             git push origin HEAD:main
           fi
