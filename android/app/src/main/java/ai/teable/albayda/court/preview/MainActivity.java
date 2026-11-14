@@ -92,10 +92,6 @@ public class MainActivity extends Activity {
         linearLayout.setBackgroundColor(NAVY);
         linearLayout.setLayoutDirection(1);
         linearLayout.setFitsSystemWindows(true);
-        Button configure = new Button(this);
-        configure.setText("إعداد رابط الخادم");
-        configure.setOnClickListener(v -> showError("أدخل رابط HTTPS للخادم."));
-        linearLayout.addView(configure);
         this.progress = new ProgressBar(this, null, android.R.attr.progressBarStyleHorizontal);
         this.progress.setMax(100);
         linearLayout.addView(this.progress, new LinearLayout.LayoutParams(-1, dp(3)));
