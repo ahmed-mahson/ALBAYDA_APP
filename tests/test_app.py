@@ -22,7 +22,7 @@ def request(path, payload=None, cookie='', **extra):
 
 class ApplicationTests(unittest.TestCase):
     def setUp(self):
-        self.env=patch.dict(os.environ,{'APP_REQUIRE_AUTH':'false'});self.env.start()
+        self.env=patch.dict(os.environ,{'APP_REQUIRE_AUTH':'false','COURT_MULTIUSER':'false'});self.env.start()
         self.records=patch.object(c,'load_case_records',return_value=[dict(RECORD)]);self.records.start()
     def tearDown(self): self.records.stop();self.env.stop()
     def test_static_files(self):
