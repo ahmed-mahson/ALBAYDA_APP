@@ -1,6 +1,0 @@
-reportlab>=5.0
-uharfbuzz
-python-bidi
-pypdf
-hijridate
-python-dotenv
