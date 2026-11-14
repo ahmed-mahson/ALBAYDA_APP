@@ -1,0 +1,17 @@
+{
+  "users": {
+    "admin": {
+      "id": "admin",
+      "name": "احمد محسون",
+      "phone": "771421919",
+      "hash": "a25ed38c397721fa6d3f91031290862a:c757945eac486898919e9f20a0c79b8a8de36670ac48536d59528ab33486d51a",
+      "role": "admin",
+      "status": "active",
+      "created": "2026-11-14T22:05:32Z",
+      "version": 1,
+      "failures": 0,
+      "locked_until": 0
+    }
+  },
+  "events": []
+}
