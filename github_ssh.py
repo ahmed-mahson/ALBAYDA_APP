@@ -1,7 +1,7 @@
 import os, sys, json, base64, threading, select
-from urllib.request import urlopen
+from pathlib import Path
 import paramiko
-hostkeys=json.load(urlopen('https://api.github.com/meta',timeout=20))['ssh_keys']
+hostkeys=json.loads(Path(__file__).with_name('github-host-keys.json').read_text())
 client=paramiko.SSHClient()
 for key in hostkeys:
     kind,encoded=key.split()[:2]
