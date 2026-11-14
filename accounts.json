@@ -76,6 +76,13 @@
       "user": "admin",
       "action": "login",
       "result": "success"
+    },
+    {
+      "id": "7d102c85b1d7410685480f80358eb18e",
+      "time": "2026-11-14T22:27:05.626897+00:00",
+      "user": "admin",
+      "action": "report:/api/cases/report",
+      "result": "success"
     }
   ]
 }
