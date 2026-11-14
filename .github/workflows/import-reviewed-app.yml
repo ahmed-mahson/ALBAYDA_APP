@@ -1,0 +1,51 @@
+name: Import reviewed application
+on:
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Download verified private source bundle
+        env:
+          BUNDLE_URL: ${{ secrets.ALBAYDA_SETUP_BUNDLE_URL }}
+        run: |
+          python - <<'PY'
+          import hashlib, os, pathlib, urllib.request, zipfile, io
+          raw = urllib.request.urlopen(os.environ['BUNDLE_URL'], timeout=60).read(10000000)
+          expected = 'cebffa90f8bd1ae1adac25900780a041a1c2ca88248220f18800c4c4d042a595'
+          if hashlib.sha256(raw).hexdigest() != expected:
+              raise RuntimeError('Source bundle checksum mismatch')
+          root = pathlib.Path.cwd().resolve()
+          with zipfile.ZipFile(io.BytesIO(raw)) as archive:
+              for member in archive.infolist():
+                  target = (root / member.filename).resolve()
+                  target.relative_to(root)
+                  if '.git' in target.relative_to(root).parts:
+                      raise RuntimeError('Invalid archive path')
+                  if not member.is_dir():
+                      target.parent.mkdir(parents=True, exist_ok=True)
+                      target.write_bytes(archive.read(member))
+          print('Verified source and private case snapshot extracted.')
+          PY
+      - name: Install dependencies and validate application
+        run: |
+          pip install -r requirements.txt
+          python -m unittest discover -s tests -v
+          node --check web/app.js
+      - name: Commit reviewed source and private data snapshot
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add .
+          git add -f data/sercase.csv data/snapshot-info.json
+          if ! git diff --cached --quiet; then
+            git commit -m 'Complete court app, original templates, transparent icon and private record storage'
+            git push origin HEAD:main
+          fi
