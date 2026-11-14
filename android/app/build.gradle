@@ -1,5 +1,6 @@
 plugins { id 'com.android.application' }
-def courtUrl = providers.gradleProperty('appUrl').getOrElse('')
+def courtUrl = providers.gradleProperty('appUrl').getOrElse('').trim()
+if (!courtUrl) courtUrl = 'https://albayda-court.onrender.com/'
 def parsedUrl = new URI(courtUrl)
 if (courtUrl && (parsedUrl.scheme != 'https' || !parsedUrl.host || parsedUrl.userInfo || parsedUrl.query || parsedUrl.fragment || !(parsedUrl.path in ['', '/']))) {
     throw new GradleException('appUrl must be an HTTPS origin, for example https://court.example.org/')
