@@ -1,25 +1,9 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
-buildscript {
-    repositories {
-        google()
-        mavenCentral()
-    }
-    dependencies {
-        // تحديد إصدار Android Gradle Plugin المتوافق مع Gradle 8.9
-        classpath 'com.android.tools.build:gradle:8.7.0'
-        // إذا كنت تستخدم Kotlin، أضف السطر التالي (تأكد من إصدار Kotlin المناسب)
-        // classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.24"
-    }
+plugins {
+    // تعريف إصدار Android Gradle Plugin (AGP) المتوافق مع Gradle 8.9
+    id 'com.android.application' version '8.7.0' apply false
 }
 
-allprojects {
-    repositories {
-        google()
-        mavenCentral()
-    }
-}
-
-// تنظيف مجلد البناء (اختياري)
 tasks.register("clean", Delete) {
     delete rootProject.buildDir
 }
