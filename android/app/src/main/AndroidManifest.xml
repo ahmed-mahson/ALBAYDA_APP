@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!-- إضافة إذن الإنترنت (ضروري جداً) -->
+    <!-- أذونات الإنترنت (ضرورية لعمل التطبيق) -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
@@ -9,11 +9,11 @@
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="تقنية معلومات محكمة البيضاء الابتدائية"
-        android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:usesCleartextTraffic="true" 
         android:theme="@style/Theme.AppCompat.Light.NoActionBar"> 
-        <!-- ملاحظة: الثيم أعلاه إجباري لكي لا يغلق التطبيق -->
+        
+        <!-- تم حذف سطر roundIcon لأنه كان يسبب الخطأ -->
 
         <activity
             android:name=".MainActivity"
