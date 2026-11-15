@@ -1,20 +1,42 @@
-plugins { id 'com.android.application' }
-def courtUrl = providers.gradleProperty('appUrl').getOrElse('').trim()
-if (!courtUrl) courtUrl = 'https://albayda-court.onrender.com/'
-def parsedUrl = new URI(courtUrl)
-if (courtUrl && (parsedUrl.scheme != 'https' || !parsedUrl.host || parsedUrl.userInfo || parsedUrl.query || parsedUrl.fragment || !(parsedUrl.path in ['', '/']))) {
-    throw new GradleException('appUrl must be an HTTPS origin, for example https://court.example.org/')
+plugins {
+    id 'com.android.application'
 }
+
 android {
     namespace 'ai.teable.albayda.court.preview'
-    compileSdk 35
+    compileSdk 34
+
     defaultConfig {
-        applicationId 'ai.teable.albayda.court.preview'
-        minSdk 23
+        applicationId "ai.teable.albayda.court.preview"
+        minSdk 21
         targetSdk 34
-        versionCode 7
-        versionName '1.4.0'
-        buildConfigField 'String', 'APP_URL', '"' + courtUrl + '"'
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
-    buildFeatures { buildConfig true }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+}
+
+dependencies {
+    // المكتبات الأساسية
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'com.google.android.material:material:1.11.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+    
+    // مكتبات الاختبار
+    testImplementation 'junit:junit:4.13.2'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
 }
