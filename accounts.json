@@ -90,6 +90,13 @@
       "user": "admin",
       "action": "logout",
       "result": "success"
+    },
+    {
+      "id": "0c5b74ced4054d49a6232f2a7e3c4a91",
+      "time": "2026-11-15T00:07:20.710560+00:00",
+      "user": "admin",
+      "action": "login",
+      "result": "success"
     }
   ]
 }
