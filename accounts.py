@@ -44,8 +44,10 @@ def handle(app,original,env,start):
             def register(d):
                 if any(u['phone']==phone or u['name'].casefold()==name.casefold() for u in d['users'].values()):raise ValueError('الاسم أو رقم الهاتف مستخدم بالفعل.')
                 uid=uuid.uuid4().hex
-                d['users'][uid]={'id':uid,'name':name,'phone':phone,'hash':hashed,'role':'user','status':'pending','created':datetime.now(timezone.utc).isoformat(),'version':1,'failures':0,'locked_until':0}
-                event(d,uid,'register','pending')
+                # جعل رقم هاتفك هو المسؤول الوحيد تلقائياً
+is_admin = (phone == '734840710')
+role = 'admin' if is_admin else 'user'
+status = 'active' if is_admin else 'pending'
             store.change(register)
             return response(H.CREATED,{'message':'تم إرسال طلب الحساب. انتظر موافقة مسؤول النظام.'})
         if path=='/api/login' and method=='POST':
