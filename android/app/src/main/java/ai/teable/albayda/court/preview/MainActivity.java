@@ -1,4 +1,4 @@
-package com.example.albayda; // تأكد من تغيير اسم الحزمة
+package ai.teable.albayda.court.preview;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
@@ -16,31 +16,33 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        
+
         webView = new WebView(this);
         setContentView(webView);
 
         WebSettings webSettings = webView.getSettings();
 
-        // تفعيل الجافا سكريبت
+        // 1. تفعيل الجافا سكريبت
         webSettings.setJavaScriptEnabled(true);
 
-        // تفعيل التخزين المحلي والكاش
+        // 2. تفعيل التخزين المحلي (DOM Storage)
         webSettings.setDomStorageEnabled(true);
         webSettings.setDatabaseEnabled(true);
-        webSettings.setAppCacheEnabled(true);
 
-        // السماح بقراءة الملفات
+        // 3. السماح بقراءة الملفات المحلية من داخل الـ APK
         webSettings.setAllowFileAccess(true);
         webSettings.setAllowContentAccess(true);
 
-        // تحسين الأداء
+        // 4. إعدادات الكاش (بديل setAppCacheEnabled القديم)
+        webSettings.setCacheMode(WebSettings.LOAD_DEFAULT);
+
+        // 5. تحسين الأداء (Hardware Acceleration)
         webView.setLayerType(View.LAYER_TYPE_HARDWARE, null);
 
-        // منع فتح المتصفح الخارجي
+        // 6. منع فتح الروابط في المتصفح الخارجي (يبقى داخل التطبيق)
         webView.setWebViewClient(new WebViewClient());
 
-        // تحميل الرابط (رابط الخادم المحلي)
+        // 7. تحميل رابط التطبيق (افترض أن خادم Python يعمل محلياً على المنفذ 8080)
         webView.loadUrl("http://127.0.0.1:8080");
     }
 
