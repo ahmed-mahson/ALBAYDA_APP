@@ -1,1 +1,28 @@
-<!doctype html><html lang="ar" dir="rtl"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>تسجيل الدخول — محكمة البيضاء</title><link rel="stylesheet" href="/style.css"><body><header><img src="/assets/app-icon-transparent.png" alt="شعار المحكمة"><div><h1>محكمة البيضاء الابتدائية</h1><p>نظام الخدمات الإلكترونية</p></div></header><main class="login"><section><img class="brand-logo" src="/assets/app-icon-transparent.png" alt="شعار تقنية المعلومات"><h1 id="form-title">تسجيل الدخول</h1><p class="subtitle">مرحبًا بك في الخدمات الإلكترونية</p><form id="login"><label>رقم الهاتف أو اسم المستخدم<input name="identity" required autocomplete="username" minlength="3" maxlength="60"></label><label>كلمة المرور<div class="password-row"><input name="password" type="password" inputmode="numeric" required autocomplete="current-password" minlength="6" maxlength="128"><button type="button" data-reveal="password" class="secondary">إظهار</button></div></label><div id="device-options" hidden><label><span><input name="remember" type="checkbox"> حفظ الدخول على هذا الهاتف</span></label><p class="hint">كلمة المرور أرقام فقط، من 6 إلى 128 رقمًا. يمكن تفعيل البصمة على الأجهزة المدعومة.</p></div><button>دخول</button></form><form id="register" hidden><label>الاسم / اسم المستخدم<input name="name" required minlength="3" maxlength="60" autocomplete="username"></label><label>رقم الهاتف<input name="phone" type="tel" required minlength="9" maxlength="15" autocomplete="tel"></label><label>كلمة المرور<div class="password-row"><input name="password" type="password" inputmode="numeric" minlength="6" maxlength="128" required autocomplete="new-password"><button type="button" data-reveal="password" class="secondary">إظهار</button></div></label><label>تأكيد كلمة المرور<input name="confirm" type="password" inputmode="numeric" minlength="6" maxlength="128" required autocomplete="new-password"></label><p class="hint">يبقى الحساب بانتظار موافقة مسؤول النظام قبل استخدام الخدمات.</p><button>إرسال طلب إنشاء الحساب</button></form><button type="button" class="secondary login-switch" id="switch">إنشاء حساب جديد</button><div id="native-actions" hidden><button id="saved" class="secondary" hidden>الدخول بالبيانات المحفوظة</button><button id="biometric" class="secondary" hidden>الدخول بالبصمة</button><button id="forget" class="secondary" hidden>نسيان بيانات هذا الهاتف</button></div><p id="message" role="alert"></p></section></main><script src="/welcome.js" defer></script><script src="/login.js" defer></script></body></html>
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>تسجيل الدخول - محكمة البيضاء</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+    <div class="login-container">
+        <!-- الشعار هنا لن يظهر ضخماً بفضل ملف CSS -->
+        <img src="/assets/app-icon-transparent.png" alt="شعار المحكمة" class="login-logo">
+        
+        <h1 class="login-title">محكمة البيضاء الابتدائية</h1>
+        <p class="login-subtitle">الخدمات الإلكترونية - تسجيل الدخول</p>
+
+        <form class="login-form" id="login-form">
+            <input type="text" id="identity" class="login-input" placeholder="رقم الهاتف أو البريد الإلكتروني" required>
+            <input type="password" id="password" class="login-input" placeholder="كلمة المرور" required>
+            <button type="submit" class="login-btn">دخول</button>
+        </form>
+        <p id="login-error" style="color: red; margin-top: 15px; font-size: 13px;"></p>
+    </div>
+
+    <!-- ملف الجافا سكريبت الخاص بتسجيل الدخول -->
+    <script src="/login.js" defer></script>
+</body>
+</html>
