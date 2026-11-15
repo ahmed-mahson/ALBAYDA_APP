@@ -1,0 +1,20 @@
+{
+  "name": "تقنية معلومات محكمة البيضاء الابتدائية",
+  "short_name": "محكمة البيضاء",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0A192F",
+  "theme_color": "#0A192F",
+  "icons": [
+    {
+      "src": "/assets/app-icon-transparent.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/assets/app-icon-transparent.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
