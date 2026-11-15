@@ -146,6 +146,13 @@
       "user": "admin",
       "action": "logout",
       "result": "success"
+    },
+    {
+      "id": "cc1b2489b70447409e195422efa5f35d",
+      "time": "2026-11-15T21:43:12.196821+00:00",
+      "user": "admin",
+      "action": "login",
+      "result": "success"
     }
   ]
 }
