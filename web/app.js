@@ -1,22 +1,36 @@
-'use strict';
-const $ = selector => document.querySelector(selector);
-const notice = (text, error=false) => {$('#notice').textContent=text;$('#notice').classList.toggle('error',error);};
-function tab(id){for(const section of document.querySelectorAll('main > section'))section.hidden=section.id!==id;for(const b of document.querySelectorAll('.bottom-nav [data-tab]'))b.classList.toggle('active',b.dataset.tab===id);$('#results').replaceChildren();notice('');if(id==='admin')loadAdmin().catch(e=>notice(e.message,true));}
-for(const button of document.querySelectorAll('[data-tab]'))button.onclick=()=>tab(button.dataset.tab);
-async function api(path,payload){const response=await fetch(path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});if(response.status===401){location.assign('/login');throw Error('سجّل الدخول للمتابعة.');}if(!response.ok){const data=await response.json();throw Error(data.error||'تعذر تنفيذ الطلب.');}return response;}
-const fields = form => Object.fromEntries(new FormData(form));
-async function busy(button, task){button.disabled=true;notice('جارٍ تنفيذ الطلب…');try{await task();}catch(error){notice(error.message,true);}finally{button.disabled=false;}}
-async function download(path,payload){const response=await api(path,payload);const blob=await response.blob();const url=URL.createObjectURL(blob);const anchor=document.createElement('a');anchor.href=url;const match=(response.headers.get('Content-Disposition')||'').match(/filename\*=UTF-8''(.+)/);anchor.download=match?decodeURIComponent(match[1]):'report.pdf';if(window.CourtAndroid){const reader=new FileReader();await new Promise((resolve,reject)=>{reader.onload=resolve;reader.onerror=reject;reader.readAsDataURL(blob);});window.CourtAndroid.savePdf(String(reader.result).split(',')[1],anchor.download);URL.revokeObjectURL(url);}else{anchor.click();setTimeout(()=>URL.revokeObjectURL(url),60000);}notice('تم تجهيز ملف PDF.');}
-function fill(select,items){const previous=select.value;select.replaceChildren(new Option('الكل','all'),...items.map(item=>new Option(item,item)));if(items.includes(previous))select.value=previous;}
-async function options(form){const payload={case_type:form.elements.case_type?.value||'all'};const response=await api('/api/cases/options',payload);const data=await response.json();if(form.elements.case_type)fill(form.elements.case_type,data.case_types);fill(form.querySelector('[data-judges]'),data.judges);}
-function cards(data, cases=false){const container=$('#results');container.replaceChildren();notice(data.count?'عدد النتائج المعروضة: '+data.count:'لا توجد نتائج مطابقة.');for(const row of data.results){const card=document.createElement('article');const list=document.createElement('dl');for(const [key,value] of Object.entries(row)){const dt=document.createElement('dt');dt.textContent=key;const dd=document.createElement('dd');dd.textContent=value||'—';list.append(dt,dd);}card.append(list);if(cases){const pdf=document.createElement('button');pdf.textContent='تنزيل تفاصيل القضية PDF';pdf.onclick=()=>busy(pdf,()=>download('/api/cases/report',{case_number:row['رقم القضية']}));const ad=document.createElement('button');ad.className='secondary';ad.textContent='إعداد إعلان حضور';ad.onclick=async()=>{tab('attendance');const form=$('#attendance-form');try{const response=await api('/api/cases/options',{});const data=await response.json();const displayType=data.case_types.find(type=>(data.case_type_sources[type]||[]).includes(row['نوع القضية']));form.elements.case_type.value=displayType||row['نوع القضية'];await options(form);form.elements.case_number.value=row['رقم القضية']||'';form.elements.judge_filter.value=(row['برئاسة القاضي']||'').replace('عبدالعزيز ناصر أحمد الهصيصي','عبدالعزيز ناصر الهصيصي');form.elements.judge.value=row['برئاسة القاضي']||'';form.elements.plaintiff.value=row['المدعي']||'';form.elements.defendant.value=row['المدعى عليه']||'';}catch(error){notice(error.message,true);}};card.append(pdf,document.createTextNode(' '),ad);}container.append(card);}}
-for(const [id,path,isCase] of [['case-search','/api/cases/search',true],['session-search','/api/sessions/search',false],['supreme-search','/api/supreme-court/search',false]]){$('#'+id).onsubmit=event=>{event.preventDefault();busy(event.submitter,async()=>{const response=await api(path,fields(event.target));cards(await response.json(),isCase);});};}
-$('#attendance-form').onsubmit=event=>{event.preventDefault();busy(event.submitter,()=>download('/api/attendance-ad',fields(event.target)));};
-for(const button of document.querySelectorAll('[data-download]'))button.onclick=()=>{const form=button.closest('form');if(form.reportValidity())busy(button,()=>download(button.dataset.download,fields(form)));};
-for(const form of [$('#case-search'),$('#attendance-form')])form.elements.case_type.onchange=()=>options(form).catch(error=>notice(error.message,true));
-$('#logout').onclick=()=>busy($('#logout'),async()=>{await api('/api/logout',{});location.replace('/login');});
-const today=new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Aden',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(new Date());const part=type=>today.find(p=>p.type===type).value;$('#session-search').elements.date.value=`${part('year')}-${part('month')}-${part('day')}`;
-$('#mobile-logout').onclick=()=>$('#logout').click();
-async function loadAdmin(){const r=await fetch('/api/admin/users');const data=await r.json();if(!r.ok)throw Error(data.error);$('#admin-users').replaceChildren();const states={pending:'بانتظار الموافقة',active:'مفعل',rejected:'مرفوض',disabled:'معطل'};for(const u of data.users){const card=document.createElement('article'),title=document.createElement('h3'),info=document.createElement('p');title.textContent=u.name;info.textContent=u.phone+' — '+states[u.status];card.append(title,info);if(u.role!=='admin')for(const [state,label] of [['active','موافقة / تفعيل'],['rejected','رفض'],['disabled','تعطيل']]){if(state===u.status)continue;const b=document.createElement('button');b.textContent=label;b.className='secondary';b.onclick=()=>busy(b,async()=>{await api('/api/admin/status',{id:u.id,status:state});await loadAdmin();});card.append(b);}$('#admin-users').append(card);}$('#admin-events').replaceChildren();const names=Object.fromEntries(data.users.map(u=>[u.id,u.name]));const actions={login:'تسجيل دخول',logout:'تسجيل خروج',register:'إنشاء حساب'};for(const e of data.events){const item=document.createElement('article');item.textContent=new Date(e.time).toLocaleString('ar-YE',{timeZone:'Asia/Aden'})+' — '+(names[e.user]||e.user)+' — '+(actions[e.action]|| (e.action.startsWith('account:')?'تعديل حساب '+(names[e.action.slice(8)]||''):e.action.startsWith('report:')?'إنشاء تقرير':e.action))+' — '+(states[e.result]||{success:'نجاح',failed:'فشل'}[e.result]||e.result);$('#admin-events').append(item);}}
-$('#refresh-admin').onclick=()=>busy($('#refresh-admin'),loadAdmin);
-(async()=>{try{const r=await fetch('/api/me');const d=await r.json();if(!r.ok)throw Error(d.error);$('#user-name').textContent=d.user.name;$('#admin-nav').hidden=d.user.role!=='admin';for(const [label,value] of [['الاسم',d.user.name],['رقم الهاتف',d.user.phone],['الصلاحية',d.user.role==='admin'?'مسؤول النظام':'مستخدم']]){const dt=document.createElement('dt'),dd=document.createElement('dd');dt.textContent=label;dd.textContent=value;$('#profile').append(dt,dd);}await Promise.all([options($('#case-search')),options($('#attendance-form')),options($('#session-search'))]);tab('home');}catch(error){notice(error.message,true);}})();
+document.addEventListener('DOMContentLoaded', () => {
+    // دالة لجلب أنواع القضايا والقضاة
+    async function loadOptions() {
+        try {
+            const response = await fetch('/api/cases/options', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ case_type: 'all' })
+            });
+            const data = await response.json();
+            
+            // تعبئة قائمة أنواع القضايا
+            const typeSelects = document.querySelectorAll('select[data-types]');
+            typeSelects.forEach(select => {
+                select.innerHTML = '<option value="all">كل الأنواع</option>';
+                data.case_types.forEach(type => {
+                    select.innerHTML += `<option value="${type}">${type}</option>`;
+                });
+            });
+
+            // تعبئة قائمة القضاة
+            const judgeSelects = document.querySelectorAll('select[data-judges]');
+            judgeSelects.forEach(select => {
+                select.innerHTML = '<option value="all">كل القضاة</option>';
+                data.judges.forEach(judge => {
+                    select.innerHTML += `<option value="${judge}">${judge}</option>`;
+                });
+            });
+        } catch (error) {
+            console.error('Failed to load options:', error);
+        }
+    }
+
+    // استدعاء الدالة عند فتح الصفحة
+    loadOptions();
+});
