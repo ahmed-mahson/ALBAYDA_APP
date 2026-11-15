@@ -7,7 +7,6 @@ pluginManagement {
 }
 
 dependencyResolutionManagement {
-    // هذا السطر يسمح بتعريف المستودعات في هذا الملف فقط
     repositoriesMode.set(RepositoriesMode.PREFER_SETTINGS)
     repositories {
         google()
