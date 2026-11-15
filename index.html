@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>تقنية معلومات محكمة البيضاء الابتدائية</title>
+    <link rel="stylesheet" href="/style.css">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#0A192F">
+</head>
+<body>
+    <!-- الهيدر العلوي المطابق للصورة -->
+    <header class="top-header">
+        <div class="header-right">
+            <img src="/assets/app-icon-transparent.png" alt="الشعار" class="header-logo">
+            <div class="header-text">
+                <h1>مرحباً بك</h1>
+                <p>في محكمة البيضاء الابتدائية</p>
+            </div>
+        </div>
+        <div class="header-left">
+            <button class="icon-btn"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#0A192F" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg></button>
+            <button class="icon-btn"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="#0A192F" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg></button>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <section id="home">
+            <!-- البانر الأزرق -->
+            <div class="banner">
+                <div class="banner-text">
+                    <h2>الخدمات الإلكترونية</h2>
+                </div>
+            </div>
+
+            <!-- شبكة البطاقات (2x2) -->
+            <div class="service-grid">
+                <button class="service-card" data-tab="cases">
+                    <div class="icon-wrapper"><svg viewBox="0 0 24 24" fill="none" stroke="#1E3A8A" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg></div>
+                    <span>الاستعلام<br>عن قضية</span>
+                </button>
+                <button class="service-card" data-tab="sessions">
+                    <div class="icon-wrapper"><svg viewBox="0 0 24 24" fill="none" stroke="#1E3A8A" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg></div>
+                    <span>الاستعلام عن<br>الجلسات اليومية</span>
+                </button>
+                <button class="service-card" data-tab="attendance">
+                    <div class="icon-wrapper"><svg viewBox="0 0 24 24" fill="none" stroke="#1E3A8A" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="15" y2="15"></line></svg></div>
+                    <span>إنشاء<br>إعلان حضور</span>
+                </button>
+                <button class="service-card" data-tab="supreme">
+                    <div class="icon-wrapper"><svg viewBox="0 0 24 24" fill="none" stroke="#1E3A8A" stroke-width="2"><path d="M3 21h18"></path><path d="M3 10h18"></path><path d="M5 6l7-3 7 3"></path><path d="M4 10v11"></path><path d="M20 10v11"></path><path d="M8 14v3"></path><path d="M12 14v3"></path><path d="M16 14v3"></path></svg></div>
+                    <span>الاستعلام عن القضايا<br>بالمحكمة العليا</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- الأقسام المخفية (ضرورية لعمل app.js) -->
+        <section id="account" hidden><div class="page-header"><h2>حسابي</h2><button class="secondary" data-tab="home">رجوع</button></div><dl id="profile"></dl><button id="logout" class="secondary" style="margin-top: 15px; width: 100%;">تسجيل الخروج</button></section>
+        <section id="admin" hidden><div class="page-header"><h2>الإدارة</h2><button class="secondary" data-tab="home">رجوع</button></div><button id="refresh-admin" class="secondary">تحديث</button><div id="admin-users"></div><div id="admin-events" class="audit"></div></section>
+        <div id="notice" role="status" aria-live="polite"></div>
+        <section id="cases" hidden><div class="page-header"><h2>بحث القضايا</h2><button class="secondary" data-tab="home">رجوع</button></div><form id="case-search"><label>رقم القضية أو اسم أحد الأطراف<input name="query" required maxlength="100"></label><label>طريقة البحث<select name="method"><option value="auto">تلقائي</option><option value="number">رقم القضية</option><option value="name">اسم المدعي أو المدعى عليه</option></select></label><label>نوع القضية<select name="case_type" data-types></select></label><label>القاضي<select name="judge" data-judges></select></label><button type="submit">بحث</button></form></section>
+        <section id="sessions" hidden><div class="page-header"><h2>الجلسات اليومية</h2><button class="secondary" data-tab="home">رجوع</button></div><form id="session-search"><label>تاريخ الجلسة<input name="date" type="date" required></label><label>القاضي<select name="judge" data-judges></select></label><button type="submit">عرض الجلسات</button><button type="button" data-download="/api/sessions/pdf">تنزيل PDF</button></form></section>
+        <section id="attendance" hidden><div class="page-header"><h2>إعلان حضور</h2><button class="secondary" data-tab="home">رجوع</button></div><form id="attendance-form"><label>رقم القضية<input name="case_number" required maxlength="40"></label><label>نوع القضية<select name="case_type" data-types required></select></label><label>القاضي المختص<select name="judge_filter" data-judges required></select></label><label>اسم القاضي في الإعلان<input name="judge" required maxlength="160"></label><label>المدعي<input name="plaintiff" required maxlength="200"></label><label>المدعى عليه<input name="defendant" required maxlength="200"></label><label>تاريخ الجلسة<input name="session_date" type="date" required></label><button type="submit">تنزيل إعلان PDF</button></form></section>
+        <section id="supreme" hidden><div class="page-header"><h2>المحكمة العليا</h2><button class="secondary" data-tab="home">رجوع</button></div><form id="supreme-search"><label>اسم الطاعن أو الملتمس<input name="name" maxlength="100"></label><label>رقم الحكم<input name="decision_number" inputmode="numeric" maxlength="30"></label><label>نوع البحث<select name="case_type"><option value="0">الكل</option><option value="طعن">طعن</option><option value="التماس">التماس</option></select></label><label>جهة الاستئناف<select name="authority"><option selected value="0">الكل</option><option value="12">البيضاء</option><option value="1">الأمانة</option><option value="2">عدن</option></select></label><button type="submit">بحث</button><button type="button" data-download="/api/supreme-court/report">تنزيل النتائج PDF</button></form></section>
+        <div id="results"></div>
+    </main>
+
+    <!-- شريط التنقل السفلي المطابق للصورة -->
+    <nav class="bottom-nav">
+        <button class="nav-item active" data-tab="home">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+            <span>الرئيسية</span>
+        </button>
+        <button class="nav-item" data-tab="cases">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+            <span>الخدمات</span>
+        </button>
+        <button class="nav-item" data-tab="account">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+            <span>حسابي</span>
+        </button>
+        <button class="nav-item" data-tab="admin" id="admin-nav" hidden>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+            <span>الإدارة</span>
+        </button>
+    </nav>
+
+    <!-- الفوتر (يظهر فقط عند التنقل) -->
+    <footer id="app-footer" style="display: none; text-align: center; padding: 12px; background: #020c1b; color: #fff;">
+        <div style="font-weight: bold; color: #D4AF37; font-size: 12px;">برمجة وتصميم / أحمد حسين محسون</div>
+        <div style="font-size: 10px; margin-top: 5px;">📲 للتواصل: 734840710 - 771421919</div>
+    </footer>
+
+    <script src="/welcome.js" defer></script>
+    <script src="/app.js" defer></script>
+</body>
+</html>
