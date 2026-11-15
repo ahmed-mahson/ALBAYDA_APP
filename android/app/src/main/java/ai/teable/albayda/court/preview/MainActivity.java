@@ -27,15 +27,13 @@ public class MainActivity extends AppCompatActivity {
         webSettings.setDatabaseEnabled(true);
         webSettings.setAllowFileAccess(true);
         webSettings.setAllowContentAccess(true);
-        
-        // الاعتماد على الكاش الافتراضي بدلاً من الدالة المحذوفة
-        webSettings.setCacheMode(WebSettings.LOAD_DEFAULT);
+        webSettings.setCacheMode(WebSettings.LOAD_DEFAULT); // بديل الكاش القديم
 
         webView.setLayerType(View.LAYER_TYPE_HARDWARE, null);
         webView.setWebViewClient(new WebViewClient());
 
-        // تحميل التطبيق
-        webView.loadUrl("http://127.0.0.1:8080");
+        // رابط الخادم المحلي (تأكد من تشغيل خادم Python)
+        webView.loadUrl("http://127.0.0.1:8080"); 
     }
 
     @Override
