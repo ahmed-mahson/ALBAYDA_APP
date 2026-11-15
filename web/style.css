@@ -1,1 +1,162 @@
-@font-face{font-family:Sultan;src:url('/assets/sultan-medium.ttf')}*{box-sizing:border-box}html{background:#041b3c}body{margin:0;background:linear-gradient(160deg,#f6fbff,#e7f1f8);color:#09284e;font:17px Sultan,Tahoma,sans-serif;min-height:100vh;line-height:1.7}header{background:linear-gradient(125deg,#03172f,#0b4280);color:#fff;padding:16px 22px;display:flex;gap:15px;align-items:center;border-bottom:2px solid #d7ad59}header img{width:82px;height:82px;object-fit:contain;background:transparent}header h1{font-size:22px;margin:0;color:#f5d58c}header p{margin:0;font-size:14px;color:#dbeaff}main{max-width:1080px;margin:20px auto;padding:0 18px 90px}h2{font-size:24px;margin-top:0}button{font:inherit;cursor:pointer;border:0;border-radius:12px;padding:12px 20px;background:linear-gradient(#e8c574,#ae7c2b);color:#08264a;box-shadow:0 3px 8px #08284b25;font-weight:bold}button.secondary{background:#edf5fc;color:#0a4782;box-shadow:none;border:1px solid #c6d9e9}button:disabled{opacity:.5;cursor:wait}button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #c9973a;outline-offset:3px}nav{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0}nav button{font-size:15px;padding:8px 12px}section,article{background:#ffffffed;padding:25px;border-radius:22px;border:1px solid #cee1ef;box-shadow:0 6px 20px #0b32570b;margin-bottom:18px}form{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px;align-items:end}label{display:flex;flex-direction:column;gap:7px}input,select{font:inherit;width:100%;padding:12px;border:1px solid #bed1e2;border-radius:12px;background:linear-gradient(#fff,#f0f7fc);color:#102f52;min-height:48px}input[type=checkbox]{width:auto;min-height:auto}input[type=tel],input[type=password]{direction:ltr;text-align:right}p.hint{font-size:14px;color:#506b83}#notice:empty{display:none}#notice,#message{padding:10px;border-radius:12px;overflow-wrap:anywhere}#notice.error,#message{color:#9b2723}dl{display:grid;grid-template-columns:minmax(100px,180px) 1fr;gap:8px 15px}dt{font-weight:bold}dd{margin:0;overflow-wrap:anywhere;white-space:pre-wrap}article{border-right:5px solid #138bcc}footer{text-align:center;color:#547089;padding:10px 18px 90px;font-size:13px}.login{max-width:480px;margin:22px auto}.login section{padding:28px 22px}.login h1,.login .subtitle{text-align:center}.login form{display:flex;flex-direction:column;align-items:stretch}.brand-logo{display:block;width:160px;height:160px;object-fit:contain;margin:0 auto;background:transparent}.login button{width:100%}.password-row{display:flex;gap:6px}.password-row button{width:auto;font-size:13px;box-shadow:none}.login-switch{margin:15px 0}.service-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.service-grid button{min-height:145px;background:linear-gradient(#fff,#e5f3ff);border:1px solid #c0d9ee;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;font-size:18px}.service-grid svg{width:40px;height:40px;fill:none;stroke:#0c4c89;stroke-width:1.8}.hero{background:radial-gradient(ellipse at 90% 0,#1b6dad,#06274c);color:white;padding:25px;border-radius:17px;margin-bottom:20px}.hero h2{color:#f3d28c}.bottom-nav{position:fixed;bottom:0;right:0;left:0;margin:0;background:#fffffff5;border-top:1px solid #d8b56d;display:flex;justify-content:space-around;padding:9px 10px;z-index:20;backdrop-filter:blur(12px)}.bottom-nav button{background:transparent;box-shadow:none;border-radius:0;font-size:14px;padding:5px 12px;color:#123c67}.bottom-nav button.active{border-top:3px solid #d0a149;color:#071e3d}.badge{display:inline-block;border-radius:20px;padding:3px 12px;background:#e2eef8;color:#104673;font-size:13px}.audit{max-height:460px;overflow:auto}.audit article{font-size:14px;padding:12px}.welcome{position:fixed;inset:0;z-index:100;background:radial-gradient(ellipse at 50% 35%,#1263a3,#041b3c 65%);color:white;display:flex;align-items:center;justify-content:center;flex-direction:column;text-align:center;padding:30px}.welcome img{width:min(65vw,290px);height:auto;background:transparent;filter:drop-shadow(0 0 30px #4caafa60)}.welcome h1{font-size:26px;color:#f3d58b}.welcome p{color:#d9e8f8}.welcome button{margin-top:20px;min-width:180px}.welcome-bar{width:75px;height:4px;border-radius:3px;background:#e0bd70;margin-top:30px}[hidden]{display:none!important}@media(max-width:600px){header{padding:10px 14px}header img{width:65px;height:65px}header h1{font-size:18px}header p{font-size:12px}main{padding:0 12px 80px;margin:14px auto}section,article{padding:18px;border-radius:20px}form{grid-template-columns:1fr}dl{grid-template-columns:1fr;gap:3px}dd{margin-bottom:10px}.service-grid button{font-size:16px;min-height:130px}main>nav{display:none}.login{margin:14px auto}.login form{gap:14px}}@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}@media print{header,nav,form,button,#notice,.welcome{display:none!important}body{background:white}article{break-inside:avoid}}
+/* إعدادات عامة */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Cairo', 'Sultan', sans-serif;
+}
+
+body {
+    background-color: #0A192F; /* الأزرق الداكن */
+    color: #ffffff;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden; /* لمنع التمرير */
+}
+
+/* الهيدر */
+header {
+    background-color: #112240;
+    padding: 15px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    border-bottom: 2px solid #D4AF37;
+}
+header img {
+    height: 45px;
+    width: 45px;
+}
+header h1 {
+    font-size: 16px;
+    font-weight: bold;
+}
+header p {
+    font-size: 12px;
+    color: #8892B0;
+}
+
+/* الحاوية الرئيسية */
+main {
+    flex: 1;
+    padding: 15px;
+    overflow-y: auto; /* تمرير داخلي فقط إذا لزم الأمر */
+    display: flex;
+    flex-direction: column;
+}
+
+/* القائمة العلوية */
+nav[aria-label="الخدمات"] {
+    display: none; /* إخفاء القائمة العلوية إن كنت تفضل الاعتماد على الشاشة الرئيسية */
+}
+
+/* صورة الترحيب */
+.hero {
+    background-color: #112240;
+    border-radius: 10px;
+    padding: 20px;
+    text-align: center;
+    margin-bottom: 15px;
+    border: 1px solid #233554;
+}
+.hero h2 {
+    font-size: 18px;
+    color: #D4AF37;
+}
+
+/* شبكة الخدمات (مضغوطة لتناسب الشاشة) */
+.service-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* عمودين */
+    gap: 10px; /* مسافة صغيرة بين الصفوف */
+    margin-bottom: 15px;
+}
+
+.service-grid button {
+    background-color: #FFFFFF;
+    color: #0A192F;
+    border: none;
+    border-radius: 10px;
+    padding: 15px 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-weight: bold;
+    font-size: 13px;
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+    transition: transform 0.2s;
+}
+
+.service-grid button:active {
+    transform: scale(0.95);
+}
+
+.service-grid svg {
+    width: 30px;
+    height: 30px;
+    fill: none;
+    stroke: #1E3A8A;
+    stroke-width: 2;
+}
+
+/* النماذج (Forms) */
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+form label {
+    font-size: 13px;
+    color: #D4AF37;
+}
+form input, form select {
+    width: 100%;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #233554;
+    background-color: #112240;
+    color: white;
+    outline: none;
+}
+form button {
+    background-color: #D4AF37; /* الذهبي */
+    color: #0A192F;
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    font-size: 15px;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+/* الفوتر */
+footer {
+    background-color: #020c1b;
+    padding: 10px;
+    text-align: center;
+    font-size: 10px;
+    color: #8892B0;
+    line-height: 1.5;
+    border-top: 1px solid #233554;
+}
+
+/* شريط التنقل السفلي */
+.bottom-nav {
+    display: flex;
+    justify-content: space-around;
+    background-color: #FFFFFF;
+    padding: 10px;
+    border-top: 1px solid #ddd;
+}
+.bottom-nav button {
+    background: none;
+    border: none;
+    color: #0A192F;
+    font-weight: bold;
+    font-size: 12px;
+}
