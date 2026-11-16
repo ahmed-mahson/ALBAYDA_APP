@@ -209,6 +209,13 @@
       "user": "admin",
       "action": "report:/api/attendance-ad",
       "result": "success"
+    },
+    {
+      "id": "65c100f6278942e782ceeb4e3f42e217",
+      "time": "2026-11-16T02:35:17.281985+00:00",
+      "user": "admin",
+      "action": "report:/api/sessions/pdf",
+      "result": "success"
     }
   ]
 }
