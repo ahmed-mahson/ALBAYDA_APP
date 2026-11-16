@@ -202,6 +202,13 @@
       "user": "admin",
       "action": "report:/api/cases/report",
       "result": "success"
+    },
+    {
+      "id": "56552697b6394d8c98d1dd4d022cbc74",
+      "time": "2026-11-16T02:31:45.778402+00:00",
+      "user": "admin",
+      "action": "report:/api/attendance-ad",
+      "result": "success"
     }
   ]
 }
