@@ -188,6 +188,13 @@
       "user": "admin",
       "action": "login",
       "result": "success"
+    },
+    {
+      "id": "72f23fcff7994c8f950d80e1f4843ed5",
+      "time": "2026-11-16T02:31:07.483423+00:00",
+      "user": "admin",
+      "action": "report:/api/cases/report",
+      "result": "success"
     }
   ]
 }
