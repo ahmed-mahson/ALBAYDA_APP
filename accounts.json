@@ -160,6 +160,13 @@
       "user": "admin",
       "action": "logout",
       "result": "success"
+    },
+    {
+      "id": "a77f26b17dae44058d883d9714990cf1",
+      "time": "2026-11-16T02:22:44.882875+00:00",
+      "user": "admin",
+      "action": "login",
+      "result": "success"
     }
   ]
 }
