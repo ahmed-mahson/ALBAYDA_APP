@@ -18,6 +18,7 @@ import case_records
 from case_records import CaseRecordsError
 from dotenv import load_dotenv
 
+
 ROOT = Path(__file__).resolve().parent
 WEB_ROOT = ROOT / "web"
 MAX_BODY_BYTES = 64 * 1024
@@ -422,43 +423,21 @@ def _post_api(path, payload, start_response):
 def _static_file(path, start_response):
     if path in {"", "/"}:
         path = "/index.html"
-    
-    # 1. التحقق من محاولات اختراق المسار (Path Traversal)
-    if ".." in path or path.startswith("/."):
-        return _json_response(
-            start_response, HTTPStatus.NOT_FOUND, {"error": "الملف غير موجود."}
-        )
-
-    # 2. تحديد المجلد الجذري
-    if path.startswith('/assets/'):
-        root = case_records.ASSETS_DIR.resolve()
-        relative = path[len('/assets/'):]
-    else:
-        root = WEB_ROOT.resolve()
-        relative = path.lstrip('/')
-
+    root = case_records.ASSETS_DIR.resolve() if path.startswith('/assets/') else WEB_ROOT.resolve()
+    relative = path[len('/assets/'):] if path.startswith('/assets/') else path.lstrip('/')
     requested = (root / unquote(relative)).resolve()
-
-    # 3. التأكد من أن المسار المطلوب يقع داخل المجلد المسموح به
     try:
         requested.relative_to(root)
     except ValueError:
         return _json_response(
-            start_response, HTTPStatus.NOT_FOUND, {"error": "الملف غير موجود."}
+            start_response, HTTPStatus.NOT_FOUND, {'error': 'الملف غير موجود.'}
         )
-
-    # 4. التحقق من الامتدادات المسموحة للمجلد assets
     if path.startswith('/assets/') and requested.suffix not in {'.webp', '.png', '.ttf'}:
-        return _json_response(
-            start_response, HTTPStatus.NOT_FOUND, {"error": "الملف غير موجود."}
-        )
-
-    # 5. التحقق من وجود الملف
+        return _json_response(start_response, HTTPStatus.NOT_FOUND, {'error': 'الملف غير موجود.'})
     if not requested.is_file():
         return _json_response(
             start_response, HTTPStatus.NOT_FOUND, {"error": "الملف غير موجود."}
         )
-
     content_types = {
         ".html": "text/html; charset=utf-8",
         ".css": "text/css; charset=utf-8",
@@ -492,13 +471,6 @@ def application(environ, start_response):
 def _legacy_application(environ, start_response):
     path = unquote(environ.get("PATH_INFO", "/"))
     method = environ.get("REQUEST_METHOD", "GET").upper()
-    
-    # 🛡️ [إصلاح أمني هام] رفض أي مسار يحتوي على ".." فوراً لمنع اختراق الملفات
-    if ".." in path or path.startswith("/."):
-        return _json_response(
-            start_response, HTTPStatus.NOT_FOUND, {"error": "الملف غير موجود."}
-        )
-
     if path == "/healthz" and method == "GET":
         return _plain_response(start_response, HTTPStatus.OK, "ok")
     if path == "/login" and method == "GET":
