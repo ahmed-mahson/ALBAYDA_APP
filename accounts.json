@@ -11,6 +11,18 @@
       "version": 10,
       "failures": 0,
       "locked_until": 0
+    },
+    "007831755489498b8e2b98106e981073": {
+      "id": "007831755489498b8e2b98106e981073",
+      "name": "ابو ياسر",
+      "phone": "734840710",
+      "hash": "b1ec081df948ed113bc50417a2678f48:9e7d98bbd5deecd1bfc71fa7ec5d7750f3c6e307e05477912ad26ff6f249f725",
+      "role": "user",
+      "status": "pending",
+      "created": "2026-11-16T02:36:14.481928+00:00",
+      "version": 1,
+      "failures": 0,
+      "locked_until": 0
     }
   },
   "events": [
@@ -223,6 +235,13 @@
       "user": "admin",
       "action": "logout",
       "result": "success"
+    },
+    {
+      "id": "d086e5388ff84972b7395809b5694d6a",
+      "time": "2026-11-16T02:36:14.481946+00:00",
+      "user": "007831755489498b8e2b98106e981073",
+      "action": "register",
+      "result": "pending"
     }
   ]
 }
