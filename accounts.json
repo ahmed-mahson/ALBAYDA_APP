@@ -181,6 +181,13 @@
       "user": "admin",
       "action": "login",
       "result": "success"
+    },
+    {
+      "id": "5a0ba09f7d8b4d06adb96060ac72dada",
+      "time": "2026-11-16T02:30:31.682035+00:00",
+      "user": "admin",
+      "action": "login",
+      "result": "success"
     }
   ]
 }
