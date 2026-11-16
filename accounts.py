@@ -40,14 +40,14 @@ def event(d, user, action, result='success'):
 
 def token(u):
     raw = base64.urlsafe_b64encode(json.dumps([u['id'], u['version'], int(time.time())]).encode()).decode().rstrip('=')
-    return raw + '.' + hmac.new(os.environ['APP_SESSION_SECRET'].encode(), raw.encode(), hashlib.sha256).hexdigest()
+    return raw + '.' + hmac.new(os.environ.get('APP_SESSION_SECRET', 'default_secret_key_for_dev').encode(), raw.encode(), hashlib.sha256).hexdigest()
 
 def current(env):
     try:
         c = SimpleCookie()
         c.load(env.get('HTTP_COOKIE', ''))
         raw, sig = c[COOKIE].value.split('.')
-        expected = hmac.new(os.environ['APP_SESSION_SECRET'].encode(), raw.encode(), hashlib.sha256).hexdigest()
+        expected = hmac.new(os.environ.get('APP_SESSION_SECRET', 'default_secret_key_for_dev').encode(), raw.encode(), hashlib.sha256).hexdigest()
         if not hmac.compare_digest(sig, expected):
             return None
         uid, version, issued = json.loads(base64.urlsafe_b64decode(raw + '=' * (-len(raw) % 4)))
@@ -62,7 +62,7 @@ def handle(app, original, env, start):
     path = env.get('PATH_INFO', '/')
     method = env.get('REQUEST_METHOD', 'GET')
     response = lambda status, data, headers=(): app._json_response(start, status, data, headers)
-    assets = {'/style.css', '/login.js', '/welcome.js', '/assets/app-icon-transparent.png', '/assets/sultan-medium.ttf'}
+    assets = {'/style.css', '/login.js', '/welcome.js', '/assets/app-icon-transparent.png', '/assets/sultan-medium.ttf', '/register.html'}
     
     if path == '/healthz':
         return original(env, start)
@@ -82,7 +82,7 @@ def handle(app, original, env, start):
             if not 3 <= len(name) <= 60 or not re.fullmatch(r'[0-9]{9,15}', phone):
                 raise ValueError('أدخل اسمًا من 3 أحرف ورقم هاتف صحيحًا.')
                 
-            # هنا تم تعديل طول كلمة المرور لتكون من 6 إلى 9 أرقام
+            # شرط كلمة المرور: من 6 إلى 9 أرقام
             if not re.fullmatch(r'[0-9]{6,9}', pw) or pw != digits(p.get('confirm', '')):
                 raise ValueError('كلمة المرور أرقام فقط، من 6 إلى 9 أرقام، ويجب تطابق التأكيد.')
                 
@@ -93,11 +93,10 @@ def handle(app, original, env, start):
                     raise ValueError('الاسم أو رقم الهاتف مستخدم بالفعل.')
                 uid = uuid.uuid4().hex
                 
-                # --- التعديل الخاص بحساب المسؤول ---
+                # جعل رقم هاتفك هو المسؤول الوحيد (Admin) تلقائياً
                 is_admin = (phone == '734840710')
                 role = 'admin' if is_admin else 'user'
                 status = 'active' if is_admin else 'pending'
-                # ----------------------------------
                 
                 d['users'][uid] = {
                     'id': uid,
@@ -210,6 +209,7 @@ def handle(app, original, env, start):
         
     except ValueError as e:
         return response(H.BAD_REQUEST, {'error': str(e)})
-    except Exception:
+    except Exception as e:
         app.LOGGER.exception('Account service unavailable')
-        return response(H.SERVICE_UNAVAILABLE, {'error': 'تعذر الاتصال بسجل الحسابات. أعد المحاولة لاحقًا.'})
+        # إظهار الخطأ الحقيقي بدلاً من الرسالة العامة
+        return response(H.SERVICE_UNAVAILABLE, {'error': f'حدث خطأ في الخادم: {str(e)}'})
