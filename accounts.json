@@ -256,6 +256,13 @@
       "user": "admin",
       "action": "logout",
       "result": "success"
+    },
+    {
+      "id": "b0072773bc4e4bed89aac87ec904a612",
+      "time": "2026-11-16T02:41:48.923397+00:00",
+      "user": "admin",
+      "action": "login",
+      "result": "success"
     }
   ]
 }
