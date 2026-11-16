@@ -8,7 +8,7 @@
       "role": "admin",
       "status": "active",
       "created": "2026-11-14T22:05:32Z",
-      "version": 9,
+      "version": 10,
       "failures": 0,
       "locked_until": 0
     }
@@ -215,6 +215,13 @@
       "time": "2026-11-16T02:35:17.281985+00:00",
       "user": "admin",
       "action": "report:/api/sessions/pdf",
+      "result": "success"
+    },
+    {
+      "id": "d0b238dc14d44a24b875124e3553e6e1",
+      "time": "2026-11-16T02:35:45.502656+00:00",
+      "user": "admin",
+      "action": "logout",
       "result": "success"
     }
   ]
