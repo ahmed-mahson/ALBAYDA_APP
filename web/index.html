@@ -1,181 +1,34 @@
-<!doctype html>
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-    <title>تقنية معلومات محكمة البيضاء الابتدائية</title>
-    <link rel="stylesheet" href="/style.css">
-    <link rel="manifest" href="/manifest.json">
-    <meta name="theme-color" content="#0A192F">
-</head>
-<body>
-    <!-- الهيدر العلوي -->
-    <header class="top-header">
-        <div class="header-right">
-            <img src="/assets/app-icon-transparent.png" alt="الشعار" class="header-logo">
-            <div class="header-text">
-                <h1>تقنية معلومات</h1>
-                <p>محكمة البيضاء الابتدائية</p>
-            </div>
-        </div>
-        <div class="header-left">
-            <button class="icon-btn"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg></button>
-            <button class="icon-btn"><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg></button>
-        </div>
-    </header>
-
-    <main class="main-content">
-        <!-- القسم الرئيسي (الشاشة الرئيسية) -->
-        <section id="home">
-            <div class="banner">
-                <div class="banner-text">
-                    <h2>الخدمات الإلكترونية</h2>
-                </div>
-            </div>
-
-            <div class="service-grid">
-                <button class="service-card" data-tab="cases">
-                    <div class="icon-wrapper"><svg viewBox="0 0 24 24" fill="none" stroke="#1E3A8A" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg></div>
-                    <span>الاستعلام<br>عن قضية</span>
-                </button>
-                <button class="service-card" data-tab="sessions">
-                    <div class="icon-wrapper"><svg viewBox="0 0 24 24" fill="none" stroke="#1E3A8A" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg></div>
-                    <span>الاستعلام عن<br>الجلسات اليومية</span>
-                </button>
-                <button class="service-card" data-tab="attendance">
-                    <div class="icon-wrapper"><svg viewBox="0 0 24 24" fill="none" stroke="#1E3A8A" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="18" x2="12" y2="12"></line><line x1="9" y1="15" x2="15" y2="15"></line></svg></div>
-                    <span>إنشاء<br>إعلان حضور</span>
-                </button>
-                <button class="service-card" data-tab="supreme">
-                    <div class="icon-wrapper"><svg viewBox="0 0 24 24" fill="none" stroke="#1E3A8A" stroke-width="2"><path d="M3 21h18"></path><path d="M3 10h18"></path><path d="M5 6l7-3 7 3"></path><path d="M4 10v11"></path><path d="M20 10v11"></path><path d="M8 14v3"></path><path d="M12 14v3"></path><path d="M16 14v3"></path></svg></div>
-                    <span>الاستعلام عن القضايا<br>بالمحكمة العليا</span>
-                </button>
-            </div>
-        </section>
-
-        <!-- قسم حسابي -->
-        <section id="account" hidden>
-            <div class="page-header"><h2>حسابي</h2><button class="secondary" data-tab="home">رجوع</button></div>
-            <dl id="profile"></dl>
-            <p class="hint">يمكنك استخدام البصمة بعد حفظ بياناتك من شاشة تسجيل الدخول.</p>
-            <button id="logout" class="secondary" style="margin-top: 15px; width: 100%;">تسجيل الخروج</button>
-        </section>
-
-        <!-- قسم الإدارة -->
-        <section id="admin" hidden>
-            <div class="page-header"><h2>إدارة المستخدمين</h2><button class="secondary" data-tab="home">رجوع</button></div>
-            <button id="refresh-admin" class="secondary">تحديث الطلبات والسجل</button>
-            <div id="admin-users"></div>
-            <h2 style="margin-top:20px;">سجل النشاط</h2>
-            <p class="hint">آخر 200 حدث. التوقيت بتوقيت اليمن.</p>
-            <div id="admin-events" class="audit"></div>
-        </section>
-
-        <!-- نماذج البحث والخدمات (مخفية افتراضياً) -->
-        <div id="notice" role="status" aria-live="polite"></div>
-
-        <section id="cases" hidden>
-            <div class="page-header"><h2>بحث القضايا</h2><button class="secondary" data-tab="home">رجوع</button></div>
-            <form id="case-search">
-                <label>رقم القضية أو اسم أحد الأطراف<input name="query" required maxlength="100"></label>
-                <label>طريقة البحث<select name="method"><option value="auto">تلقائي</option><option value="number">رقم القضية</option><option value="name">اسم المدعي أو المدعى عليه</option></select></label>
-                <label>نوع القضية<select name="case_type" data-types></select></label>
-                <label>القاضي<select name="judge" data-judges></select></label>
-                <button type="submit">بحث</button>
-            </form>
-            <p class="hint">يُعرض حتى خمس نتائج لكل بحث. يمكن إدخال الأرقام العربية أو الإنجليزية.</p>
-        </section>
-
-        <section id="sessions" hidden>
-            <div class="page-header"><h2>قائمة الجلسات اليومية</h2><button class="secondary" data-tab="home">رجوع</button></div>
-            <form id="session-search">
-                <label>تاريخ الجلسة<input name="date" type="date" required></label>
-                <label>القاضي<select name="judge" data-judges></select></label>
-                <button type="submit">عرض الجلسات</button>
-                <button type="button" data-download="/api/sessions/pdf">تنزيل القائمة PDF</button>
-            </form>
-        </section>
-
-        <section id="attendance" hidden>
-            <div class="page-header"><h2>إعلان حضور</h2><button class="secondary" data-tab="home">رجوع</button></div>
-            <p class="hint">اختر القضية من نتائج البحث لتعبئة النموذج، ثم راجع الأطراف والتاريخ قبل التنزيل.</p>
-            <form id="attendance-form">
-                <label>رقم القضية<input name="case_number" required maxlength="40"></label>
-                <label>نوع القضية<select name="case_type" data-types required></select></label>
-                <label>القاضي المختص<select name="judge_filter" data-judges required></select></label>
-                <label>اسم القاضي في الإعلان<input name="judge" required maxlength="160"></label>
-                <label>المدعي<input name="plaintiff" required maxlength="200"></label>
-                <label>المدعى عليه<input name="defendant" required maxlength="200"></label>
-                <label>تاريخ الجلسة<input name="session_date" type="date" required></label>
-                <button type="submit">تنزيل إعلان PDF</button>
-            </form>
-        </section>
-
-        <section id="supreme" hidden>
-            <div class="page-header"><h2>بحث المحكمة العليا</h2><button class="secondary" data-tab="home">رجوع</button></div>
-            <form id="supreme-search">
-                <label>اسم الطاعن أو الملتمس<input name="name" maxlength="100"></label>
-                <label>رقم الحكم<input name="decision_number" inputmode="numeric" maxlength="30"></label>
-                <label>نوع البحث<select name="case_type"><option value="0">الكل</option><option value="طعن">طعن</option><option value="التماس">التماس</option></select></label>
-                <label>جهة الاستئناف<select name="authority">
-                    <option selected value="0">الكل</option>
-                    <option value="1">الأمانة</option><option value="2">عدن</option><option value="3">صنعاءوالجوف</option><option value="4">تعز</option>
-                    <option value="5">حضرموت</option><option value="6">الحديدة</option><option value="7">إب</option><option value="8">لحج</option>
-                    <option value="9">حجه</option><option value="10">الضالع</option><option value="11">ذمار</option><option value="12">البيضاء</option>
-                    <option value="13">أبين</option><option value="14">عمران</option><option value="15">صعده</option><option value="16">شبوه</option>
-                    <option value="17">المهره</option><option value="18">المحويت</option><option value="19">مأرب</option><option value="20">ريمه</option>
-                    <option value="21">النائب العام</option><option value="22">المحكمة الاستئنافية المتخصصة</option><option value="23">المحكمة الاستئنافية العسكرية</option>
-                </select></label>
-                <button type="submit">بحث</button>
-                <button type="button" data-download="/api/supreme-court/report">تنزيل النتائج PDF</button>
-            </form>
-        </section>
-
-        <div id="results"></div>
-    </main>
-
-    <!-- شريط التنقل السفلي -->
-    <nav class="bottom-nav">
-        <button class="nav-item active" data-tab="home">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
-            <span>الرئيسية</span>
-        </button>
-        <button class="nav-item" data-tab="cases">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
-            <span>الخدمات</span>
-        </button>
-        <button class="nav-item" data-tab="account">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-            <span>حسابي</span>
-        </button>
-        <button class="nav-item" data-tab="admin" id="admin-nav" hidden>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
-            <span>الإدارة</span>
-        </button>
-    </nav>
-
-    <!-- الفوتر -->
-    <footer id="app-footer">
-        <div style="font-weight: bold; color: #D4AF37; margin-bottom: 4px;">برمجة وتصميم / أحمد حسين محسون</div>
-        <div>📲 للتواصل والدعم الفني: 734840710 - 771421919</div>
-        <div class="footer-links">
-            <a href="https://wa.me/qr/QIQRW7LA325GG1" target="_blank">WhatsApp</a> | 
-            <a href="https://t.me/Ahmed_Mahson" target="_blank">Telegram</a>
-        </div>
-    </footer>
-
-    <script src="/welcome.js" defer></script>
-    <script src="/app.js" defer></script>
-    
-    <!-- كود تفعيل العمل بدون إنترنت (Service Worker) -->
-    <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/service-worker.js')
-                    .then(registration => console.log('Service Worker registered successfully.'))
-                    .catch(err => console.log('Service Worker registration failed: ', err));
-            });
-        }
-    </script>
-</body>
-</html>
+<!doctype html><html lang="ar" dir="rtl"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>تقنية معلومات محكمة البيضاء الابتدائية</title><link rel="stylesheet" href="/style.css">
+<body><header><img src="/assets/app-icon-transparent.png" alt="شعار المحكمة"><div><h1>تقنية معلومات محكمة البيضاء الابتدائية</h1><p>الاستعلام عن القضايا والجلسات</p></div></header><main>
+<nav aria-label="الخدمات"><button data-tab="cases">بحث القضايا</button><button data-tab="sessions">قائمة الجلسات</button><button data-tab="attendance">إعلان حضور</button><button data-tab="supreme">المحكمة العليا</button><button id="logout" class="secondary">تسجيل الخروج</button></nav>
+<section id="home"><div class="hero"><h2>مرحبًا بك <span id="user-name"></span></h2><p>الخدمات الإلكترونية لمحكمة البيضاء الابتدائية</p></div><div class="service-grid"><button data-tab="cases"><svg viewBox="0 0 40 40" aria-hidden="true"><path d="M8 5h18v23H8z M13 11h8 M13 17h5 M25 24a7 7 0 1 0 0 .1 M30 30l7 7"/></svg>الاستعلام عن قضية</button><button data-tab="sessions"><svg viewBox="0 0 40 40" aria-hidden="true"><path d="M6 9h28v26H6z M6 17h28 M13 4v10 M27 4v10 M13 23h3 M23 23h3 M13 29h3 M23 29h3"/></svg>الجلسات اليومية</button><button data-tab="attendance"><svg viewBox="0 0 40 40" aria-hidden="true"><path d="M8 4h20v30H8z M13 11h10 M13 17h10 M28 23v14 M21 30h14"/></svg>إنشاء إعلان حضور</button><button data-tab="supreme"><svg viewBox="0 0 40 40" aria-hidden="true"><path d="M3 14L20 4l17 10z M7 34h26 M5 38h30 M10 17v14 M20 17v14 M30 17v14"/></svg>المحكمة العليا</button></div></section><section id="account" hidden><h2>حسابي</h2><dl id="profile"></dl><p class="hint">يمكنك استخدام البصمة بعد حفظ بياناتك من شاشة تسجيل الدخول.</p></section><section id="admin" hidden><h2>إدارة المستخدمين</h2><button id="refresh-admin" class="secondary">تحديث الطلبات والسجل</button><div id="admin-users"></div><h2>سجل النشاط</h2><p class="hint">آخر 200 حدث. السجل الكامل محفوظ في المستودع الخاص. التوقيت بتوقيت اليمن.</p><div id="admin-events" class="audit"></div></section><div id="notice" role="status" aria-live="polite"></div>
+<section id="cases" hidden><h2>بحث القضايا</h2><form id="case-search"><label>رقم القضية أو اسم أحد الأطراف<input name="query" required maxlength="100"></label><label>طريقة البحث<select name="method"><option value="auto">تلقائي</option><option value="number">رقم القضية</option><option value="name">اسم المدعي أو المدعى عليه</option></select></label><label>نوع القضية<select name="case_type" data-types></select></label><label>القاضي<select name="judge" data-judges></select></label><button>بحث</button></form><p class="hint">يُعرض حتى خمس نتائج لكل بحث. يمكن إدخال الأرقام العربية أو الإنجليزية ورقم القضية بالترتيبين.</p></section>
+<section id="sessions" hidden><h2>قائمة الجلسات اليومية</h2><form id="session-search"><label>تاريخ الجلسة<input name="date" type="date" required></label><label>القاضي<select name="judge" data-judges></select></label><button>عرض الجلسات</button><button type="button" data-download="/api/sessions/pdf">تنزيل القائمة PDF</button></form></section>
+<section id="attendance" hidden><h2>إعلان حضور</h2><p class="hint">اختر القضية من نتائج البحث لتعبئة النموذج، ثم راجع الأطراف والتاريخ قبل التنزيل.</p><form id="attendance-form"><label>رقم القضية<input name="case_number" required maxlength="40"></label><label>نوع القضية<select name="case_type" data-types required></select></label><label>القاضي المختص<select name="judge_filter" data-judges required></select></label><label>اسم القاضي في الإعلان<input name="judge" required maxlength="160"></label><label>المدعي<input name="plaintiff" required maxlength="200"></label><label>المدعى عليه<input name="defendant" required maxlength="200"></label><label>تاريخ الجلسة<input name="session_date" type="date" required></label><button>تنزيل إعلان PDF</button></form></section>
+<section id="supreme" hidden><h2>بحث المحكمة العليا</h2><form id="supreme-search"><label>اسم الطاعن أو الملتمس<input name="name" maxlength="100"></label><label>رقم الحكم<input name="decision_number" inputmode="numeric" maxlength="30"></label><label>نوع البحث<select name="case_type"><option value="0">الكل</option><option value="طعن">طعن</option><option value="التماس">التماس</option></select></label><label>جهة الاستئناف<select name="authority">
+			<option selected value="0">الكل</option>
+			<option value="1">الأمانة</option>
+			<option value="2">عدن</option>
+			<option value="3">صنعاءوالجوف</option>
+			<option value="4">تعز</option>
+			<option value="5">حضرموت</option>
+			<option value="6">الحديدة</option>
+			<option value="7">إب</option>
+			<option value="8">لحج</option>
+			<option value="9">حجه</option>
+			<option value="10">الضالع</option>
+			<option value="11">ذمار</option>
+			<option value="12">البيضاء</option>
+			<option value="13">أبين</option>
+			<option value="14">عمران</option>
+			<option value="15">صعده</option>
+			<option value="16">شبوه</option>
+			<option value="17">المهره</option>
+			<option value="18">المحويت</option>
+			<option value="19">مأرب</option>
+			<option value="20">ريمه</option>
+			<option value="21">النائب العام</option>
+			<option value="22">المحكمة الاستئنافية المتخصصة</option>
+			<option value="23">المحكمة الاستئنافية العسكرية</option>
+			</select></label><button>بحث</button><button type="button" data-download="/api/supreme-court/report">تنزيل النتائج PDF</button></form><p class="hint">المصدر: موقع المحكمة العليا اليمنية ysc.org.ye؛ تُجلب النتائج مباشرة عند البحث.</p></section>
+<div id="results"></div></main><nav class="bottom-nav" aria-label="التنقل الرئيسي"><button data-tab="home">الرئيسية</button><button data-tab="cases">الخدمات</button><button data-tab="account">حسابي</button><button data-tab="admin" id="admin-nav" hidden>الإدارة</button><button id="mobile-logout">خروج</button></nav><footer>مصدر القضايا والجلسات: سجل Google Drive المعتمد · تحديث الذاكرة المؤقتة كل خمس دقائق · توقيت اليمن UTC+3</footer><script src="/welcome.js" defer></script><script src="/app.js" defer></script></body></html>
