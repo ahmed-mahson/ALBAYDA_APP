@@ -242,6 +242,13 @@
       "user": "007831755489498b8e2b98106e981073",
       "action": "register",
       "result": "pending"
+    },
+    {
+      "id": "ddf0168b7d4b410da17f8d98afbba60b",
+      "time": "2026-11-16T02:36:29.678681+00:00",
+      "user": "admin",
+      "action": "login",
+      "result": "success"
     }
   ]
 }
