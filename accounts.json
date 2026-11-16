@@ -8,7 +8,7 @@
       "role": "admin",
       "status": "active",
       "created": "2026-11-14T22:05:32Z",
-      "version": 8,
+      "version": 9,
       "failures": 0,
       "locked_until": 0
     }
@@ -166,6 +166,13 @@
       "time": "2026-11-16T02:22:44.882875+00:00",
       "user": "admin",
       "action": "login",
+      "result": "success"
+    },
+    {
+      "id": "403d799523fb4c39bcb4ca2e349c5837",
+      "time": "2026-11-16T02:28:17.474317+00:00",
+      "user": "admin",
+      "action": "logout",
       "result": "success"
     }
   ]
